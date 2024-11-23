@@ -1,21 +1,23 @@
-/*
+﻿/*
 	THIS FILE IS A PART OF RDR 2 SCRIPT HOOK SDK
 				http://dev-c.com
 			(C) Alexander Blade 2019
 */
 
 #include "script.h"
+#include <fstream>
+#include <iostream>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <iostream>
-#include <fstream>
+#include "maps.h"
 
 
 DWORD	vehUpdateTime;
 DWORD	pedUpdateTime;
 
 std::map<Ped, Blip> blips;
+std::map<Hash, const char* > animalsNames;
 
 void update()
 {
@@ -94,7 +96,7 @@ void update()
 		
 		MAP::SET_BLIP_SPRITE(animalBli, (Hash)-1646261997, true);
 		MAP::SET_BLIP_SCALE(animalBli, 0.8);
-		MAP::_SET_BLIP_NAME(animalBli, HUD::GET_STRING_FROM_HASH_KEY(ENTITY::_GET_PED_ANIMAL_TYPE(peds[i])));
+		MAP::_SET_BLIP_NAME(animalBli, animalsNames[ENTITY::_GET_PED_ANIMAL_TYPE(peds[i])]);
 	}
 
 	for (auto& pair : blips) {
@@ -104,8 +106,46 @@ void update()
 	}
 }
 
+void loadLang() 
+{
+	CSimpleIniA GeneralIni;
+	CSimpleIniA LangIni;
+	const char* pv;
+	char path[32];
+	char folderPath[15] = "AnimalsFinder/";
+
+	// get the value of a key that doesn't exist
+
+	SI_Error rc = GeneralIni.LoadFile("AnimalsFinder/AnimalsFinder.ini");
+	if (rc < 0) { std::wcout << L"Idiot." << std::endl; return; };
+
+
+	pv = GeneralIni.GetValue("GENERAL", "langFilePath", "");
+
+	sprintf_s(path, "%s%s", folderPath, pv);
+
+	LangIni.LoadFile(path);
+
+	// Get all keys in a section
+	CSimpleIniA::TNamesDepend keys;
+	LangIni.GetAllKeys("LANG", keys);
+
+	// Iterate through keys and get their values
+	for (const auto& key : keys) {
+		const char* value = LangIni.GetValue("LANG", key.pItem, "");
+
+		animalsNames[typetoHash[key.pItem]] = value;
+		// Process the key-value pair
+		// key.pItem is the key name, value is the corresponding value
+	}
+}
+
 void main()
-{		
+{	
+
+	loadLang();
+
+
 	while (true)
 	{
 		update();

@@ -7,14 +7,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\iniReader\ConvertUTF.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="script.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\inc\main.h" />
-    <ClInclude Include="..\..\inc\enums.h" />
-    <ClInclude Include="..\..\inc\natives.h" />
-    <ClInclude Include="..\..\inc\types.h" />
+    <ClInclude Include="..\inc\enums.h" />
+    <ClInclude Include="..\inc\main.h" />
+    <ClInclude Include="..\inc\nativeCaller.h" />
+    <ClInclude Include="..\inc\natives.h" />
+    <ClInclude Include="..\inc\types.h" />
+    <ClInclude Include="..\iniReader\ConvertUTF.h" />
+    <ClInclude Include="..\iniReader\SimpleIni.h" />
+    <ClInclude Include="maps.h" />
     <ClInclude Include="script.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -61,7 +66,7 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalOptions>..\..\lib\ScriptHookRDR2.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>..\lib\ScriptHookRDR2.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>
