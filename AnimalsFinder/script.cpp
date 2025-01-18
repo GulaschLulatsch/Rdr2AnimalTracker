@@ -17,7 +17,21 @@ DWORD	vehUpdateTime;
 DWORD	pedUpdateTime;
 
 std::map<Ped, Blip> blips;
-std::map<Hash, const char* > animalsNames;
+std::map<Hash, const char*> animalsNames;
+CSimpleIniA LangIni;
+bool showBirds;
+bool showExcellentQuality;
+bool showMediumQuality;
+bool showPoorQuality;
+
+void removeOrModifyBlip(bool showQuality, Blip *animalBlip, Hash hash) {
+	if (showQuality) {
+		MAP::BLIP_ADD_MODIFIER(*animalBlip, hash);
+		return;
+	}
+
+	MAP::REMOVE_BLIP(animalBlip);
+}
 
 void update()
 {
@@ -50,7 +64,7 @@ void update()
 			continue;
 		}
 
-		if (ENTITY::_GET_IS_BIRD(peds[i])) {
+		if (!showBirds && ENTITY::_GET_IS_BIRD(peds[i])) {
 			continue;
 		}
 
@@ -79,24 +93,28 @@ void update()
 			continue;
 		}
 
-		Blip animalBli = MAP::BLIP_ADD_FOR_ENTITY((Hash)1664425300, peds[i]);
-		blips[peds[i]] = animalBli;
-		currentBlips[peds[i]] = animalBli;
+		Blip animalBlip = MAP::BLIP_ADD_FOR_ENTITY((Hash)1664425300, peds[i]);
+		blips[peds[i]] = animalBlip;
+		currentBlips[peds[i]] = animalBlip;
 
-		if (PED::_GET_PED_QUALITY(peds[i]) == ePedQuality::PQ_MEDIUM) {
-			MAP::BLIP_ADD_MODIFIER(animalBli, (Hash)0xF91DD38D);
-		}
-		else if (PED::_GET_PED_QUALITY(peds[i]) == ePedQuality::PQ_HIGH) {
-			MAP::BLIP_ADD_MODIFIER(animalBli, (Hash)0xA5C4F725);
-		}
-		else if (PED::_GET_PED_QUALITY(peds[i]) == ePedQuality::PQ_MAX) {
-			MAP::BLIP_ADD_MODIFIER(animalBli, (Hash)0xF89D75CE);
+		switch (PED::_GET_PED_QUALITY(peds[i])) {
+		case ePedQuality::PQ_INVALID:
+		case ePedQuality::PQ_LOW:
+			removeOrModifyBlip(showPoorQuality, &animalBlip, (Hash)0xA2814CC7);
+			break;
+		case ePedQuality::PQ_MEDIUM:
+			removeOrModifyBlip(showMediumQuality, &animalBlip, (Hash)0xF91DD38D);
+			break;
+		case ePedQuality::PQ_HIGH:
+			removeOrModifyBlip(showExcellentQuality, &animalBlip, (Hash)0xA5C4F725);
+			break;
 		}
 
 		
-		MAP::SET_BLIP_SPRITE(animalBli, (Hash)-1646261997, true);
-		MAP::SET_BLIP_SCALE(animalBli, 0.8);
-		MAP::_SET_BLIP_NAME(animalBli, animalsNames[ENTITY::_GET_PED_ANIMAL_TYPE(peds[i])]);
+		MAP::SET_BLIP_SPRITE(animalBlip, (Hash)-1646261997, true);
+		MAP::SET_BLIP_SCALE(animalBlip, 0.8);
+		MAP::_SET_BLIP_NAME(animalBlip, animalsNames[ENTITY::_GET_PED_ANIMAL_TYPE(peds[i])]);
+		//MAP::_SET_BLIP_NAME(animalBli, "Привет, проверка");
 	}
 
 	for (auto& pair : blips) {
@@ -105,24 +123,14 @@ void update()
 		}
 	}
 }
-
-void loadLang() 
-{
-	CSimpleIniA GeneralIni;
-	CSimpleIniA LangIni;
-	const char* pv;
+void loadLang(const CSimpleIniA &generalIni) {
+	const char* langFilePath;
 	char path[32];
 	char folderPath[15] = "AnimalsFinder/";
 
-	// get the value of a key that doesn't exist
+	langFilePath = generalIni.GetValue("GENERAL", "langFilePath", "undefinded");
 
-	SI_Error rc = GeneralIni.LoadFile("AnimalsFinder/AnimalsFinder.ini");
-	if (rc < 0) { std::wcout << L"Idiot." << std::endl; return; };
-
-
-	pv = GeneralIni.GetValue("GENERAL", "langFilePath", "");
-
-	sprintf_s(path, "%s%s", folderPath, pv);
+	sprintf_s(path, "%s%s", folderPath, langFilePath);
 
 	LangIni.LoadFile(path);
 
@@ -130,20 +138,60 @@ void loadLang()
 	CSimpleIniA::TNamesDepend keys;
 	LangIni.GetAllKeys("LANG", keys);
 
+
+	//std::ofstream out;          // поток для записи
+	//out.open("hello.txt");      // открываем файл для записи
+
+	//if (out.is_open())
+	//{
+
+
+
 	// Iterate through keys and get their values
 	for (const auto& key : keys) {
-		const char* value = LangIni.GetValue("LANG", key.pItem, "");
+		const char* value = LangIni.GetValue("LANG", key.pItem, "undefinded");
 
 		animalsNames[typetoHash[key.pItem]] = value;
+
+		//out << value << std::endl;
 		// Process the key-value pair
 		// key.pItem is the key name, value is the corresponding value
 	}
 }
 
+bool getBoolIniValue(const char* value) {
+	return (value != nullptr && std::string(value) == "true");
+}
+
+void loadIni() 
+{
+	CSimpleIniA generalIni;
+	
+
+	// get the value of a key that doesn't exist
+
+	SI_Error siError = generalIni.LoadFile("AnimalsFinder/AnimalsFinder.ini");
+	if (siError < 0) throw "Error!Could not find the ini file";
+
+	
+	loadLang(generalIni);
+
+	showBirds = getBoolIniValue(generalIni.GetValue("GENERAL", "showBirds", false));
+	showExcellentQuality = getBoolIniValue(generalIni.GetValue("GENERAL", "showExcellentQuality", false));
+	showMediumQuality = getBoolIniValue(generalIni.GetValue("GENERAL", "showMediumQuality", false));
+	showPoorQuality = getBoolIniValue(generalIni.GetValue("GENERAL", "showPoorQuality", false));
+
+	//}
+
+
+}
+
+
+
 void main()
 {	
 
-	loadLang();
+	loadIni();
 
 
 	while (true)
