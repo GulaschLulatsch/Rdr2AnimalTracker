@@ -5,7 +5,7 @@
 */
 
 #include "..\inc\main.h"
-#include "script.h"
+#include "animalsFinder.h"
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {
