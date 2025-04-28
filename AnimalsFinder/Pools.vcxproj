@@ -9,8 +9,10 @@
   <ItemGroup>
     <ClCompile Include="..\iniReader\ConvertUTF.c" />
     <ClCompile Include="IniOptions.cpp" />
+    <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="animalsFinder.cpp" />
+    <ClCompile Include="scriptmenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\enums.h" />
@@ -21,8 +23,10 @@
     <ClInclude Include="..\iniReader\ConvertUTF.h" />
     <ClInclude Include="..\iniReader\SimpleIni.h" />
     <ClInclude Include="IniOptions.h" />
+    <ClInclude Include="keyboard.h" />
     <ClInclude Include="namesInfo.h" />
     <ClInclude Include="animalsFinder.h" />
+    <ClInclude Include="scriptmenu.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8D82F34A-1D64-465B-84B1-37F89AD3D20B}</ProjectGuid>

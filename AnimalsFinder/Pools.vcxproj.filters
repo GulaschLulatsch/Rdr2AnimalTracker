@@ -7,6 +7,8 @@
       <Filter>include\iniReader</Filter>
     </ClCompile>
     <ClCompile Include="IniOptions.cpp" />
+    <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="scriptmenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animalsFinder.h" />
@@ -33,6 +35,8 @@
     </ClInclude>
     <ClInclude Include="namesInfo.h" />
     <ClInclude Include="IniOptions.h" />
+    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="scriptmenu.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
