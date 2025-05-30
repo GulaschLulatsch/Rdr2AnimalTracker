@@ -205,13 +205,13 @@ public:
 };
 
 class MenuItemFlush : public MenuItemDefault {
-	map<Hash, const char*> oldAnimalsNames;
-	map<Hash, const char*>* currentAnimalsNames;
-	map<Hash, const char*>* selectedAnimalsNames;
+	map<Hash, std::string> oldAnimalsNames;
+	map<Hash, std::string>* currentAnimalsNames;
+	map<Hash, std::string>* selectedAnimalsNames;
 
 	virtual void OnSelect();
 
-public:MenuItemFlush(string caption, map<Hash, const char*> oldAnimalsNames, map<Hash, const char*>* currentAnimalsNames, map<Hash, const char*>* selectedAnimalsNames)
+public:MenuItemFlush(string caption, map<Hash, std::string> oldAnimalsNames, map<Hash, std::string>* currentAnimalsNames, map<Hash, std::string>* selectedAnimalsNames)
 	: MenuItemDefault(caption),
 	oldAnimalsNames(oldAnimalsNames),
 	currentAnimalsNames(currentAnimalsNames),
@@ -221,13 +221,13 @@ public:MenuItemFlush(string caption, map<Hash, const char*> oldAnimalsNames, map
 class MenuItemAnimals : public MenuItemDefault
 {
 	Hash hash;
-	map<Hash, const char*>* animalsNames;
-	map<Hash, const char*>* selectedAnimalsNames;
-	const char* name;
+	map<Hash, std::string>* animalsNames;
+	map<Hash, std::string>* selectedAnimalsNames;
+	std::string name;
 	
 	virtual void OnSelect();
 public:
-	MenuItemAnimals(string caption, Hash hash, const char* name, map<Hash, const char*>* animalsNames, map<Hash, const char*>* selectedAnimalsNames)
+	MenuItemAnimals(string caption, Hash hash, std::string name, map<Hash, std::string>* animalsNames, map<Hash, std::string>* selectedAnimalsNames)
 		: MenuItemDefault(caption),
 		hash(hash),
 		name(name),
