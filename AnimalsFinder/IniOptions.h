@@ -16,7 +16,7 @@ protected:
 	IniOptions& loadOptions();
 public:
 	IniOptions();
-	std::map<Hash, const char*> getAnimalsNames();
+	std::map<Hash, std::string> getAnimalsNames();
 	bool getShowBirds();
 	bool getShowExcellentQuality();
 	bool getShowMediumQuality();

@@ -83,7 +83,7 @@ AnimalsFinder& AnimalsFinder::update()
 
 		MAP::SET_BLIP_SPRITE(animalBlip, (Hash)-1646261997, true);
 		MAP::SET_BLIP_SCALE(animalBlip, 0.8);
-		MAP::_SET_BLIP_NAME(animalBlip, this->animalsNames[ENTITY::_GET_PED_ANIMAL_TYPE(peds[i])]);
+		MAP::_SET_BLIP_NAME(animalBlip, this->animalsNames[ENTITY::_GET_PED_ANIMAL_TYPE(peds[i])].c_str());
 	}
 
 	for (auto& pair : this->blips) {
@@ -96,7 +96,7 @@ AnimalsFinder& AnimalsFinder::update()
 	return *this;
 }
 
-MenuBase* CreateMainMenu(MenuController* controller, map<Hash, const char*>* animalsNames, map<Hash, const char*>* selectedAnimalsNames)
+MenuBase* CreateMainMenu(MenuController* controller, map<Hash, std::string>* animalsNames, map<Hash, std::string>* selectedAnimalsNames)
 {
 	auto menu = new MenuBase(new MenuItemTitle("ANIMALS FINDER"));
 	controller->RegisterMenu(menu);
@@ -113,7 +113,7 @@ MenuBase* CreateMainMenu(MenuController* controller, map<Hash, const char*>* ani
 void AnimalsFinder::run()
 {
 	auto menuController = new MenuController();
-	map<Hash, const char*> selectAnimalsNames;
+	map<Hash, std::string> selectAnimalsNames;
 	auto mainMenu = CreateMainMenu(menuController, &this->animalsNames, &selectAnimalsNames);
 
 	while (true)
