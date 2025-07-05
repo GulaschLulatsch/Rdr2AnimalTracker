@@ -2,6 +2,10 @@
 #include "scriptmenu.h"
 #include "keyboard.h"
 
+#include <algorithm>
+#include <map>
+#include <string>
+#include <vector>
 
 DWORD	vehUpdateTime;
 DWORD	pedUpdateTime;
@@ -103,8 +107,18 @@ MenuBase* CreateMainMenu(MenuController* controller, map<Hash, std::string>* ani
 
 	menu->AddItem(new MenuItemFlush("Flush", *animalsNames, animalsNames, selectedAnimalsNames));
 
-	for (const auto& animal : *animalsNames) {
-		menu->AddItem(new MenuItemAnimals(animal.second, animal.first, animal.second, animalsNames, selectedAnimalsNames));
+	std::vector<const std::pair<const Hash, std::string>*> sortedNames; // use vector of pointers to avoid unnecesssary copy
+	sortedNames.reserve(animalsNames->size());
+	for (const auto& entry : *animalsNames) {
+		sortedNames.push_back(&entry); // not sorted yet
+	}
+
+	std::sort(sortedNames.begin(), sortedNames.end(), [](const auto* a, const auto* b) {
+		return a->second < b->second;
+	});
+
+	for (const auto& animal : sortedNames) {
+		menu->AddItem(new MenuItemAnimals(animal->second, animal->first, animal->second, animalsNames, selectedAnimalsNames));
 	}
 
 	return menu;
