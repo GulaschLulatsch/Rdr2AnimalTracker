@@ -16,6 +16,8 @@ class MenuController;
 struct ColorRgba
 {
 	byte	r, g, b, a;
+
+	ColorRgba adjustBrightness(float factor) const;
 };
 
 enum eMenuItemClass

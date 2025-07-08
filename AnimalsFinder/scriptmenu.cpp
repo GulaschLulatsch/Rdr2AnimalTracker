@@ -1,5 +1,7 @@
 #include "scriptmenu.h"
 
+#include <algorithm>
+
 void DrawText(float x, float y, char* str)
 {
 	UI::DRAW_TEXT(GAMEPLAY::CREATE_STRING(10, "LITERAL_STRING", str), x, y);
@@ -57,7 +59,7 @@ void MenuItemBase::OnDraw(float lineTop, float lineLeft, bool active)
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 	DrawText(lineLeft + m_textLeft, lineTop + m_lineHeight / 4.5f, const_cast<char*>(GetCaption().c_str()));
 	// rect
-	color = active ? m_colorRectActive : m_colorRect;
+	color = m_colorRect.adjustBrightness(active ? 1.25 : 1);
 	DrawRect(lineLeft, lineTop, m_lineWidth, m_lineHeight, color.r, color.g, color.b, color.a);
 }
 
@@ -104,9 +106,19 @@ void MenuItemFlush::OnSelect() {
 }
 
 void MenuItemAnimals::OnSelect() {
-	(*this->selectedAnimalsNames)[hash] = name;
+	auto& selectedMap = *this->selectedAnimalsNames; 
+	auto it = selectedMap.find(hash);
+	if (it == selectedMap.end()) {
+		// not present, add it to map
+		selectedMap[hash] = name;
+		this->SetColorRect(MenuItemDefault_colorRectActive);
+	}
+	else {
+		// if present, remove it
+		selectedMap.erase(hash);
+		this->SetColorRect(MenuItemDefault_colorRect);
+	}
 	(*this->animalsNames) = (*this->selectedAnimalsNames);
-	this->SetColorRect(MenuItemDefault_colorRectActive);
 }
 
 void MenuBase::OnDraw()
@@ -201,4 +213,12 @@ void MenuController::DrawStatusText()
 		UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 		DrawText(0.5, 0.5, const_cast<char*>(m_statusText.c_str()));
 	}
+}
+
+ColorRgba ColorRgba::adjustBrightness(float factor) const
+{
+	auto adjust = [factor](byte c) -> byte {
+		return static_cast<byte>((std::max)(0.0f, (std::min)(255.0f, c * factor)));
+	};
+	return ColorRgba{ adjust(r), adjust(g), adjust(b), a };
 }
