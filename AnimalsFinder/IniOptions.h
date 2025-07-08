@@ -2,7 +2,7 @@
 #ifndef INI_OPTIONS_H
 #define INI_OPTIONS_H
 #include "..\iniReader\SimpleIni.h"
-#include "..\inc\types.h";
+#include "..\inc\types.h"
 
 class IniOptions
 {

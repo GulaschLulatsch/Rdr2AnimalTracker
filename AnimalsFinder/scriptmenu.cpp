@@ -29,9 +29,9 @@ void DrawRect(float lineLeft, float lineTop, float lineWidth, float lineHeight, 
 
 void MenuItemBase::WaitAndDraw(int ms)
 {
-	DWORD time = GetTickCount() + ms;
+	auto time = GetTickCount64() + ms;
 	bool waited = false;
-	while (GetTickCount() < time || !waited)
+	while (GetTickCount64() < time || !waited)
 	{
 		WAIT(0);
 		waited = true;
@@ -193,7 +193,7 @@ int MenuBase::OnInput()
 
 void MenuController::DrawStatusText()
 {
-	if (GetTickCount() < m_statusTextMaxTicks)
+	if (GetTickCount64() < m_statusTextMaxTicks)
 	{
 		UI::SET_TEXT_SCALE(0.55, 0.55);
 		UI::SET_TEXT_COLOR_RGBA(255, 255, 255, 255);
