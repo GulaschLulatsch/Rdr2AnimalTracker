@@ -38,7 +38,7 @@ class MenuItemBase
 	ColorRgba	m_colorRectActive;
 	ColorRgba	m_colorTextActive;
 
-	MenuBase* m_menu;
+	MenuBase* m_menu{ nullptr };
 protected:
 	MenuItemBase(
 		float lineWidth, float lineHeight, float textLeft,
@@ -180,7 +180,7 @@ class MenuBase
 	int		m_activeLineIndex;
 	int		m_activeScreenIndex;
 
-	MenuController* m_controller;
+	MenuController* m_controller{ nullptr };
 public:
 	MenuBase(MenuItemTitle* itemTitle)
 		: m_itemTitle(itemTitle),
@@ -269,13 +269,13 @@ class MenuController
 	vector<MenuBase*>		m_menuList;
 	vector<MenuBase*>		m_menuStack;
 
-	DWORD	m_inputTurnOnTime;
+	ULONGLONG	m_inputTurnOnTime;
 
 	string	m_statusText;
-	DWORD	m_statusTextMaxTicks;
+	ULONGLONG	m_statusTextMaxTicks;
 
-	void InputWait(int ms) { m_inputTurnOnTime = GetTickCount() + ms; }
-	bool InputIsOnWait() { return m_inputTurnOnTime > GetTickCount(); }
+	void InputWait(int ms) { m_inputTurnOnTime = GetTickCount64() + ms; }
+	bool InputIsOnWait() { return m_inputTurnOnTime > GetTickCount64(); }
 	MenuBase* GetActiveMenu() { return m_menuStack.size() ? m_menuStack[m_menuStack.size() - 1] : NULL; }
 	void DrawStatusText();
 	void OnDraw()
@@ -308,7 +308,7 @@ public:
 	bool HasActiveMenu() { return m_menuStack.size() > 0; }
 	void PushMenu(MenuBase* menu) { if (IsMenuRegistered(menu)) m_menuStack.push_back(menu); }
 	void PopMenu() { if (m_menuStack.size()) m_menuStack.pop_back(); }
-	void SetStatusText(string text, int ms) { m_statusText = text, m_statusTextMaxTicks = GetTickCount() + ms; }
+	void SetStatusText(string text, int ms) { m_statusText = text, m_statusTextMaxTicks = GetTickCount64() + ms; }
 	bool IsMenuRegistered(MenuBase* menu)
 	{
 		for (size_t i = 0; i < m_menuList.size(); i++)
