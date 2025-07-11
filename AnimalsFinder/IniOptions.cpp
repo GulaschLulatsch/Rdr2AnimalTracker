@@ -1,43 +1,47 @@
 #include "IniOptions.h"
+
 #include "namesInfo.h"
 
-IniOptions::IniOptions() 
-{
-	this->showBirds = false;
-	this->showExcellentQuality = false;
-	this->showMediumQuality = false;
-	this->showPoorQuality = false;
+#include "../inc/types.h"
+#include "../iniReader/SimpleIni.h"
 
-	this->loadOptions();
+#include <cstdio>
+#include <map>
+#include <stdexcept>
+#include <string>
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem;
+
+char const * const IniOptions::sectionName{ "GENERAL" };
+
+IniOptions::IniOptions(fs::path const & generalInifile)
+{
+	if (generalIni.LoadFile(generalInifile.c_str()) < 0) {
+		throw std::runtime_error{ "Error! Failed to load the ini file: " + fs::absolute(generalInifile).string()};
+	}
+	showBirds = getBoolIniValue(generalIni.GetValue(sectionName, "showBirds", nullptr));
+	showExcellentQuality = getBoolIniValue(generalIni.GetValue(sectionName, "showExcellentQuality", nullptr));
+	showMediumQuality = getBoolIniValue(generalIni.GetValue(sectionName, "showMediumQuality", nullptr));
+	showPoorQuality = getBoolIniValue(generalIni.GetValue(sectionName, "showPoorQuality", nullptr));
 }
 
 bool IniOptions::getBoolIniValue(const char* value) {
-	return (value != nullptr && std::string(value) == "true");
+	return (value != nullptr) && (std::string(value) == "true");
 }
 
-std::map<Hash, std::string> IniOptions::getAnimalsNames()
+std::map<Hash, std::string> IniOptions::getAnimalsNames() const
 {
-	const char* langFilePath;
-	char path[32];
-	char folderPath[15] = "AnimalsFinder/";
+	fs::path langFilePath{ fs::path{ "AnimalsFinder" } / generalIni.GetValue(sectionName, "langFilePath", "eng.ini") };
+
 	CSimpleIniA LangIni;
-
-	langFilePath = this->generalIni.GetValue("GENERAL", "langFilePath", "undefinded");
-
-	sprintf_s(path, "%s%s", folderPath, langFilePath);
-
-	LangIni.LoadFile(path);
+	if(LangIni.LoadFile(langFilePath.c_str()) < 0) {
+		throw std::runtime_error{ std::string{ "Error! Failed to load the language file: " } + fs::absolute(langFilePath).string()};
+	};
 
 	// Get all keys in a section
 	CSimpleIniA::TNamesDepend keys;
 	LangIni.GetAllKeys("LANG", keys);
-
-
-	//std::ofstream out;          // поток для записи
-	//out.open("hello.txt");      // открываем файл для записи
-
-	//if (out.is_open())
-	//{
 
 	std::map<Hash, std::string> animalsNames;
 
@@ -45,48 +49,30 @@ std::map<Hash, std::string> IniOptions::getAnimalsNames()
 	for (const auto& key : keys) {
 		const char* value = LangIni.GetValue("LANG", key.pItem, "undefinded");
 
-		animalsNames[typetoHash[key.pItem]] = std::string(value);
-
-		//out << value << std::endl;
-		// Process the key-value pair
-		// key.pItem is the key name, value is the corresponding value
+		animalsNames.insert({ typetoHash.at(key.pItem), std::string(value) });
 	}
 
 	return animalsNames;
 }
 
-IniOptions &IniOptions::loadOptions() 
+
+bool IniOptions::getShowBirds() const
 {
-	// get the value of a key that doesn't exist
-
-	SI_Error siError = this->generalIni.LoadFile("AnimalsFinder/AnimalsFinder.ini");
-	if (siError < 0) throw "Error!Could not find the ini file";
-
-	this->showBirds = this->getBoolIniValue(this->generalIni.GetValue("GENERAL", "showBirds", false));
-	this->showExcellentQuality = this->getBoolIniValue(this->generalIni.GetValue("GENERAL", "showExcellentQuality", false));
-	this->showMediumQuality = this->getBoolIniValue(this->generalIni.GetValue("GENERAL", "showMediumQuality", false));
-	this->showPoorQuality = this->getBoolIniValue(this->generalIni.GetValue("GENERAL", "showPoorQuality", false));
-
-	return *this;
+	return showBirds;
 }
 
-bool IniOptions::getShowBirds()
+bool IniOptions::getShowExcellentQuality() const
 {
-	return this->showBirds;
+	return showExcellentQuality;
 }
 
-bool IniOptions::getShowExcellentQuality()
+bool IniOptions::getShowMediumQuality() const
 {
-	return this->showExcellentQuality;
+	return showMediumQuality;
 }
 
-bool IniOptions::getShowMediumQuality()
+bool IniOptions::getShowPoorQuality() const
 {
-	return this->showMediumQuality;
-}
-
-bool IniOptions::getShowPoorQuality()
-{
-	return this->showPoorQuality;
+	return showPoorQuality;
 }
 

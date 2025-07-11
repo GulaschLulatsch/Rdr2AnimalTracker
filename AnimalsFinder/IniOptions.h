@@ -1,25 +1,31 @@
 #pragma once
-#ifndef INI_OPTIONS_H
-#define INI_OPTIONS_H
-#include "..\iniReader\SimpleIni.h"
+
 #include "..\inc\types.h"
+#include "..\iniReader\SimpleIni.h"
+
+#include <experimental/filesystem>
+#include <map>
+#include <string>
 
 class IniOptions
 {
-protected:
-	CSimpleIniA generalIni{};
-	bool showBirds;
-	bool showExcellentQuality;
-	bool showMediumQuality;
-	bool showPoorQuality;
-	bool getBoolIniValue(const char* value);
-	IniOptions& loadOptions();
 public:
-	IniOptions();
-	std::map<Hash, std::string> getAnimalsNames();
-	bool getShowBirds();
-	bool getShowExcellentQuality();
-	bool getShowMediumQuality();
-	bool getShowPoorQuality();
+	IniOptions( std::experimental::filesystem::path const& generalInifile);
+
+	std::map<Hash, std::string> getAnimalsNames() const;
+	bool getShowBirds() const;
+	bool getShowExcellentQuality() const;
+	bool getShowMediumQuality() const;
+	bool getShowPoorQuality() const;
+
+private:
+	static bool getBoolIniValue(const char* value);
+
+	static char const* const const sectionName;
+
+	CSimpleIniA generalIni{};
+	bool showBirds{ false };
+	bool showExcellentQuality{ false };
+	bool showMediumQuality{ false };
+	bool showPoorQuality{ false };
 };
-#endif

@@ -98,27 +98,27 @@ void MenuItemMenu::OnSelect()
 
 
 void MenuItemFlush::OnSelect() {
-	this->selectedAnimalsNames->clear();
-	(*this->currentAnimalsNames) = this->oldAnimalsNames;
-	for (MenuItemBase* item : this->GetMenu()->GetItems()) {
+	selectedAnimalsNames->clear();
+	(*currentAnimalsNames) = oldAnimalsNames;
+	for (MenuItemBase* item : GetMenu()->GetItems()) {
 		item->SetColorRect(MenuItemDefault_colorRect);
 	}
 }
 
 void MenuItemAnimals::OnSelect() {
-	auto& selectedMap = *this->selectedAnimalsNames; 
+	auto& selectedMap = *selectedAnimalsNames; 
 	auto it = selectedMap.find(hash);
 	if (it == selectedMap.end()) {
 		// not present, add it to map
 		selectedMap[hash] = name;
-		this->SetColorRect(MenuItemDefault_colorRectActive);
+		SetColorRect(MenuItemDefault_colorRectActive);
 	}
 	else {
 		// if present, remove it
 		selectedMap.erase(hash);
-		this->SetColorRect(MenuItemDefault_colorRect);
+		SetColorRect(MenuItemDefault_colorRect);
 	}
-	(*this->animalsNames) = (*this->selectedAnimalsNames);
+	(*animalsNames) = (*selectedAnimalsNames);
 }
 
 void MenuBase::OnDraw()
