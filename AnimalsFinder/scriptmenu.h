@@ -17,7 +17,7 @@ struct ColorRgba
 {
 	byte	r, g, b, a;
 
-	ColorRgba adjustBrightness(float factor) const;
+	ColorRgba adjustBrightness(double factor) const;
 };
 
 enum eMenuItemClass
@@ -225,14 +225,12 @@ class MenuItemAnimals : public MenuItemDefault
 	Hash hash;
 	map<Hash, std::string>* animalsNames;
 	map<Hash, std::string>* selectedAnimalsNames;
-	std::string name;
 	
 	virtual void OnSelect();
 public:
-	MenuItemAnimals(string caption, Hash hash, std::string name, map<Hash, std::string>* animalsNames, map<Hash, std::string>* selectedAnimalsNames)
+	MenuItemAnimals(string caption, Hash hash, map<Hash, std::string>* animalsNames, map<Hash, std::string>* selectedAnimalsNames)
 		: MenuItemDefault(caption),
 		hash(hash),
-		name(name),
 		animalsNames(animalsNames),
 		selectedAnimalsNames(selectedAnimalsNames) {}
 };

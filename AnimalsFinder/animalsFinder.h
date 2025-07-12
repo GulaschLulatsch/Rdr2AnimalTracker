@@ -3,8 +3,6 @@
 #include "IniOptions.h"
 
 #include "../inc/types.h"
-
-#include <experimental/filesystem>
 #include <map>
 #include <string>
 
@@ -15,14 +13,17 @@ public:
 	void run();
 
 private:
-	AnimalsFinder& removeOrModifyBlip(bool showQuality, Blip* animalBlip, Hash hash);
-	AnimalsFinder& update();
+	void update();
 
-	static std::experimental::filesystem::path const iniFilePath;
+	bool qualityMatchesIni(int quality);
 
-	std::map<Ped, Blip> blips{};
-	std::map<Hash, std::string> animalsNames{};
+	static void removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash);
+
+	static std::string const iniFilePath;
+
 	IniOptions iniOptions;
+	std::map<Ped, Blip> blips{};
+	std::map<Hash, std::string> animalsNames;
 };
 
 

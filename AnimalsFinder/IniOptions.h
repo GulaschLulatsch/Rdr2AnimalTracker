@@ -3,14 +3,13 @@
 #include "..\inc\types.h"
 #include "..\iniReader\SimpleIni.h"
 
-#include <experimental/filesystem>
 #include <map>
 #include <string>
 
 class IniOptions
 {
 public:
-	IniOptions( std::experimental::filesystem::path const& generalInifile);
+	IniOptions( std::string const& generalInifile);
 
 	std::map<Hash, std::string> getAnimalsNames() const;
 	bool getShowBirds() const;

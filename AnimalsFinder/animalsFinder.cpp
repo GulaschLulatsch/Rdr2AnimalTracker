@@ -1,119 +1,156 @@
 ﻿#include "animalsfinder.h"
-#include "scriptmenu.h"
-#include "keyboard.h"
 
-#include <algorithm>
-#include <map>
+#include "scriptmenu.h"
+
+#include "../inc/enums.h"
+#include "../inc/main.h"
+#include "../inc/natives.h"
+#include "../inc/types.h"
+
+#include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
 DWORD	vehUpdateTime;
 DWORD	pedUpdateTime;
 
-
-std::experimental::filesystem::path const AnimalsFinder::iniFilePath{ "AnimalsFinder/AnimalsFinder.ini" };
+std::string const AnimalsFinder::iniFilePath{ "AnimalsFinder/AnimalsFinder.ini" };
 
 AnimalsFinder::AnimalsFinder() :
-	iniOptions{ iniFilePath }
-{
-	animalsNames = iniOptions.getAnimalsNames();
-}
+	iniOptions{ iniFilePath },
+	animalsNames{ iniOptions.getAnimalsNames() }
+{}
 
-AnimalsFinder& AnimalsFinder::removeOrModifyBlip(bool showQuality, Blip* animalBlip, Hash hash) {
+void AnimalsFinder::removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash) {
 	if (showQuality) {
-		MAP::BLIP_ADD_MODIFIER(*animalBlip, hash);
-		return *this;
+		MAP::BLIP_ADD_MODIFIER(animalBlip, hash);
+	}else{
+		MAP::REMOVE_BLIP(&animalBlip);
 	}
-
-	MAP::REMOVE_BLIP(animalBlip);
-	return *this;
 }
 
-AnimalsFinder& AnimalsFinder::update()
+void AnimalsFinder::update()
 {
 
 	Player player = PLAYER::PLAYER_ID();
 	Ped playerPed = PLAYER::PLAYER_PED_ID();
 
 	if (!ENTITY::DOES_ENTITY_EXIST(playerPed) || !PLAYER::IS_PLAYER_CONTROL_ON(player))
-		return *this;
+		return;
 
 	const int ARR_SIZE = 1024;
 
-	Ped peds[ARR_SIZE];
-	int count = worldGetAllPeds(peds, ARR_SIZE);
+	std::vector<Ped> peds{};
+	peds.resize(ARR_SIZE) ;
+	int count = worldGetAllPeds(peds.data(), ARR_SIZE);
+	peds.resize(count);
 
-	std::map<Ped, Blip> currentBlips;
-	for (int i = 0; i < count; i++)
+	static const Hash unknownAnimalTypeMagicValue{ 4141559444 };
+
+	std::set<Ped> currentBlips;
+	for (Ped ped: peds)
 	{
-		if (PED::IS_PED_HUMAN(peds[i]))
+		if (PED::IS_PED_HUMAN(ped))
 			continue;
 
-		if (ENTITY::_GET_PED_ANIMAL_TYPE(peds[i]) == 4141559444) {
-			continue;
-		}
-
-		if (!iniOptions.getShowBirds() && ENTITY::_GET_IS_BIRD(peds[i])) {
+		Hash animalType{ ENTITY::_GET_PED_ANIMAL_TYPE(ped) };
+		if (animalType == unknownAnimalTypeMagicValue) { // what the fuck is this magic value??
 			continue;
 		}
 
-		if (animalsNames.find(ENTITY::_GET_PED_ANIMAL_TYPE(peds[i])) == animalsNames.end()) {
+		bool isBird{ static_cast<bool>(ENTITY::_GET_IS_BIRD(ped)) };
+		if (!iniOptions.getShowBirds() && isBird) {
 			continue;
 		}
 
+		if (animalsNames.find(animalType) == animalsNames.end()) {
+			continue;
+		}
 
-		Vector3 animCords = ENTITY::GET_ENTITY_COORDS(peds[i], TRUE, FALSE);
+		Vector3 animCords = ENTITY::GET_ENTITY_COORDS(ped, TRUE, FALSE);
 		Vector3 plv = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE, FALSE);
 		float dist = MISC::GET_DISTANCE_BETWEEN_COORDS(plv.x, plv.y, plv.z, animCords.x, animCords.y, animCords.z, FALSE);
 
-		if (blips.find(peds[i]) != blips.end()) {
-			MAP::SET_BLIP_COORDS(blips[peds[i]], animCords.x, animCords.y, animCords.z);
-			currentBlips[peds[i]] = blips[peds[i]];
+		int quality = PED::_GET_PED_QUALITY(ped);
+		bool qualityMatches = qualityMatchesIni(quality);
+
+		auto iterator = blips.find(ped);
+		if (iterator != blips.end()) {
+			if (qualityMatches) {
+				MAP::SET_BLIP_COORDS(iterator->second, animCords.x, animCords.y, animCords.z);
+				currentBlips.insert(ped);
+			}
+			else {
+				MAP::REMOVE_BLIP(&iterator->second); // TODO also remove from blips?
+			}
 			continue;
 		}
+		if (!qualityMatches) {
+			continue;
+		}
+		static const Hash unknownBlipHash{ 0x63351D54 };
+		Blip animalBlip = MAP::BLIP_ADD_FOR_ENTITY(unknownBlipHash, ped);
+		blips.insert({ ped, animalBlip });
+		currentBlips.insert(ped);
 
-		Blip animalBlip = MAP::BLIP_ADD_FOR_ENTITY((Hash)1664425300, peds[i]);
-		blips[peds[i]] = animalBlip;
-		currentBlips[peds[i]] = animalBlip;
-
-		switch (PED::_GET_PED_QUALITY(peds[i])) {
-		case ePedQuality::PQ_INVALID:
-		case ePedQuality::PQ_LOW:
-			removeOrModifyBlip(iniOptions.getShowPoorQuality(), &animalBlip, (Hash)0xA2814CC7);
-			break;
-		case ePedQuality::PQ_MEDIUM:
-			removeOrModifyBlip(iniOptions.getShowMediumQuality(), &animalBlip, (Hash)0xF91DD38D);
-			break;
-		case ePedQuality::PQ_HIGH:
-			removeOrModifyBlip(iniOptions.getShowExcellentQuality(), &animalBlip, (Hash)0xA5C4F725);
-			break;
+		if (quality <= ePedQuality::PQ_LOW ) {
+			static const Hash blipModifierArea_solidWhite{ 0xA2814CC7 };
+			MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierArea_solidWhite);
+		}
+		else if (quality == ePedQuality::PQ_MEDIUM) {
+			static const Hash blipModifierDebugBlue_solidBlue{ 0xF91DD38D };
+			MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugBlue_solidBlue);
+		}
+		else {
+			static const Hash blipModifierDebugYellow_solidYellow{ 0xA5C4F725 };
+			MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugYellow_solidYellow);
 		}
 
-		MAP::SET_BLIP_SPRITE(animalBlip, (Hash)-1646261997, true);
+		static const Hash animalTexture{ 0x9DE00913 };
+		static const Hash fishTexture{ 0xA216510E };
+		static const Hash smallDotTexture{ 0x000A9056 };
+		MAP::SET_BLIP_SPRITE(animalBlip, isBird ? smallDotTexture : animalTexture, true);
 		MAP::SET_BLIP_SCALE(animalBlip, 0.8);
-		MAP::_SET_BLIP_NAME(animalBlip, animalsNames[ENTITY::_GET_PED_ANIMAL_TYPE(peds[i])].c_str());
+
+		//MAP::_SET_BLIP_NAME(animalBlip, HUD::GET_STRING_FROM_HASH_KEY(animalType));
+		MAP::_SET_BLIP_NAME(animalBlip, animalsNames.at(animalType).c_str()); 
 	}
 
+
 	for (auto& pair : blips) {
-		if (currentBlips.find(pair.first) == currentBlips.end()) {
-			MAP::REMOVE_BLIP(&blips[pair.first]);
+		auto currentIterator = currentBlips.find(pair.first);
+		if (currentIterator == currentBlips.end()) {
+			MAP::REMOVE_BLIP(&pair.second);
 			blips.erase(pair.first);
 		}
 	}
-
-	return *this;
 }
 
-MenuBase* CreateMainMenu(MenuController const& controller, map<Hash, std::string>* animalsNames, map<Hash, std::string>* selectedAnimalsNames)
+bool AnimalsFinder::qualityMatchesIni(int quality)
 {
-	auto menu = new MenuBase(new MenuItemTitle("ANIMALS FINDER"));
-	controller->RegisterMenu(menu);
+	if ((quality <= ePedQuality::PQ_LOW) && iniOptions.getShowPoorQuality()) {
+		return true;
+	}
+	if ((quality == ePedQuality::PQ_MEDIUM) && iniOptions.getShowMediumQuality()) {
+		return true;
+	}
+	if ((quality >= ePedQuality::PQ_HIGH) && iniOptions.getShowExcellentQuality()) {
+		return true;
+	}
+	return false;
+}
 
-	menu->AddItem(new MenuItemFlush("Flush", *animalsNames, animalsNames, selectedAnimalsNames));
+std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, map<Hash, std::string>& animalsNames, map<Hash, std::string>& selectedAnimals)
+{
+	auto menu = std::make_unique<MenuBase>(new MenuItemTitle("ANIMALS FINDER"));
+	controller.RegisterMenu(menu.get());
+
+	menu->AddItem(new MenuItemFlush("Flush", animalsNames, &animalsNames, &selectedAnimals));
 
 	std::vector<const std::pair<const Hash, std::string>*> sortedNames; // use vector of pointers to avoid unnecesssary copy
-	sortedNames.reserve(animalsNames->size());
-	for (const auto& entry : *animalsNames) {
+	sortedNames.reserve(animalsNames.size());
+	for (const auto& entry : animalsNames) {
 		sortedNames.push_back(&entry); // not sorted yet
 	}
 
@@ -122,7 +159,7 @@ MenuBase* CreateMainMenu(MenuController const& controller, map<Hash, std::string
 	});
 
 	for (const auto& animal : sortedNames) {
-		menu->AddItem(new MenuItemAnimals(animal->second, animal->first, animal->second, animalsNames, selectedAnimalsNames));
+		menu->AddItem(new MenuItemAnimals(animal->second, animal->first, &animalsNames, &selectedAnimals));
 	}
 
 	return menu;
@@ -131,15 +168,15 @@ MenuBase* CreateMainMenu(MenuController const& controller, map<Hash, std::string
 void AnimalsFinder::run()
 {
 	MenuController menuController{};
-	map<Hash, std::string> selectAnimalsNames;
-	auto mainMenu = CreateMainMenu(menuController, &animalsNames, &selectAnimalsNames);
+	map<Hash, std::string> selectedAnimals{};
+	auto mainMenu = CreateMainMenu(menuController, animalsNames, selectedAnimals);
 
 	while (true)
 	{
 		if (!menuController.HasActiveMenu() && MenuInput::MenuSwitchPressed())
 		{
 			MenuInput::MenuInputBeep();
-			menuController.PushMenu(mainMenu);
+			menuController.PushMenu(mainMenu.get());
 		}
 		menuController.Update();
 
