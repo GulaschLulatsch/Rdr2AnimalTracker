@@ -33,6 +33,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Pools</RootNamespace>
     <ProjectName>AnimalsFinder</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -52,7 +53,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.asi</TargetExt>
-    <OutDir>bin\$(Configuration)\</OutDir>
+    <OutDir>C:\Users\GulaschLulatsch\AppData\Roaming\Vortex\reddeadredemption2\mods\Animals Finder-5241-1-1-1749176498</OutDir>
     <IntDir>tmp\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

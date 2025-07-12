@@ -9,16 +9,13 @@
 #include <map>
 #include <stdexcept>
 #include <string>
-#include <experimental/filesystem>
-
-namespace fs = std::experimental::filesystem;
 
 char const * const IniOptions::sectionName{ "GENERAL" };
 
-IniOptions::IniOptions(fs::path const & generalInifile)
+IniOptions::IniOptions(std::string const & generalInifile)
 {
 	if (generalIni.LoadFile(generalInifile.c_str()) < 0) {
-		throw std::runtime_error{ "Error! Failed to load the ini file: " + fs::absolute(generalInifile).string()};
+		throw std::runtime_error{ "Error! Failed to load the ini file: " + generalInifile};
 	}
 	showBirds = getBoolIniValue(generalIni.GetValue(sectionName, "showBirds", nullptr));
 	showExcellentQuality = getBoolIniValue(generalIni.GetValue(sectionName, "showExcellentQuality", nullptr));
@@ -32,11 +29,11 @@ bool IniOptions::getBoolIniValue(const char* value) {
 
 std::map<Hash, std::string> IniOptions::getAnimalsNames() const
 {
-	fs::path langFilePath{ fs::path{ "AnimalsFinder" } / generalIni.GetValue(sectionName, "langFilePath", "eng.ini") };
+	std::string langFilePath{ std::string{ "AnimalsFinder/" } + generalIni.GetValue(sectionName, "langFilePath", "eng.ini") };
 
 	CSimpleIniA LangIni;
 	if(LangIni.LoadFile(langFilePath.c_str()) < 0) {
-		throw std::runtime_error{ std::string{ "Error! Failed to load the language file: " } + fs::absolute(langFilePath).string()};
+		throw std::runtime_error{ std::string{ "Error! Failed to load the language file: " } + langFilePath};
 	};
 
 	// Get all keys in a section

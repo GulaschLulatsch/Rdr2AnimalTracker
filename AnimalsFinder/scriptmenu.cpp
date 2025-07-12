@@ -106,16 +106,15 @@ void MenuItemFlush::OnSelect() {
 }
 
 void MenuItemAnimals::OnSelect() {
-	auto& selectedMap = *selectedAnimalsNames; 
-	auto it = selectedMap.find(hash);
-	if (it == selectedMap.end()) {
+	auto it = selectedAnimalsNames->find(hash);
+	if (it == selectedAnimalsNames->end()) {
 		// not present, add it to map
-		selectedMap[hash] = name;
+		selectedAnimalsNames->insert({ hash, GetCaption() });
 		SetColorRect(MenuItemDefault_colorRectActive);
 	}
 	else {
 		// if present, remove it
-		selectedMap.erase(hash);
+		selectedAnimalsNames->erase(hash);
 		SetColorRect(MenuItemDefault_colorRect);
 	}
 	(*animalsNames) = (*selectedAnimalsNames);
@@ -215,10 +214,10 @@ void MenuController::DrawStatusText()
 	}
 }
 
-ColorRgba ColorRgba::adjustBrightness(float factor) const
+ColorRgba ColorRgba::adjustBrightness(double factor) const
 {
 	auto adjust = [factor](byte c) -> byte {
-		return static_cast<byte>((std::max)(0.0f, (std::min)(255.0f, c * factor)));
+		return static_cast<byte>((std::max)(0.0, (std::min)(255.0, c * factor)));
 	};
 	return ColorRgba{ adjust(r), adjust(g), adjust(b), a };
 }
