@@ -1,9 +1,10 @@
 #include "IniOptions.h"
 
-#include "namesInfo.h"
+#include "NamesInfo.h"
 
-#include "../inc/types.h"
-#include "../iniReader/SimpleIni.h"
+#include "RDR2ScriptHook/types.h"
+
+#include "SimpleIni/SimpleIni.h"
 
 #include <cstdio>
 #include <map>

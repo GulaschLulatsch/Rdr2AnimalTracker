@@ -1,12 +1,9 @@
 #pragma once
-#ifndef MYHEADER_H
-#define MYHEADER_H
+
+#include "RDR2ScriptHook\types.h"
+
+#include <string>
 #include <map>
-#include "..\inc\types.h"
-
-#define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
-
-
 
 std::map<std::string, const Hash> typetoHash = {
 {"AT_ARMADILLO", 0xFD60CD61},
@@ -261,5 +258,3 @@ std::map<std::string, const Hash> typetoHash = {
 {"AT_WOODPECKER_PILEATED", 0xE8AD182F},
 { "AT_WOODPECKER_RED", 0x2382C079 }
 };
-
-#endif // MYHEADER_H

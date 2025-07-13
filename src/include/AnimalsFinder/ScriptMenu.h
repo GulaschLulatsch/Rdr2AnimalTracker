@@ -1,24 +1,20 @@
 #pragma once
 
 #include "keyboard.h"
-#include "..\inc\natives.h"
+#include "ColorRgba.h"
 
-#include <windows.h>
-#include <vector>
-#include <string>
+#include "RDR2ScriptHook/types.h"
+
 #include <map>
+#include <string>
+#include <sysinfoapi.h>
+#include <vector>
+#include <windows.h>
 
 using namespace std;
 
 class MenuBase;
 class MenuController;
-
-struct ColorRgba
-{
-	byte	r, g, b, a;
-
-	ColorRgba adjustBrightness(double factor) const;
-};
 
 enum eMenuItemClass
 {

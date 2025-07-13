@@ -1,33 +1,13 @@
 #include "scriptmenu.h"
 
-#include <algorithm>
+#include "ColorRgba.h"
+#include "DrawUtils.h"
 
-void DrawText(float x, float y, char* str)
-{
-	UI::DRAW_TEXT(GAMEPLAY::CREATE_STRING(10, "LITERAL_STRING", str), x, y);
-}
+#include "RDR2ScriptHook/main.h"
+#include "RDR2ScriptHook/natives.h"
 
-void DrawRect(float lineLeft, float lineTop, float lineWidth, float lineHeight, int r, int g, int b, int a)
-{
-	float outline = 0.002f;
-
-	// Center coordinates for the filled rectangle
-	float centerX = lineLeft + (lineWidth * 0.5f);
-	float centerY = lineTop + (lineHeight * 0.5f);
-
-	// Draw filled rectangle
-	GRAPHICS::DRAW_RECT(centerX, centerY, lineWidth, lineHeight, r, g, b, a, 0, 0);
-
-	// Draw outline rectangles
-	// Top
-	//GRAPHICS::DRAW_RECT(centerX, lineTop - (outline * 0.5f), lineWidth + outline * 2, outline, r, g, b, a, 0, 0);
-	// Bottom
-	GRAPHICS::DRAW_RECT(centerX, lineTop + lineHeight + (outline * 0.5f), lineWidth + outline * 2, outline, 0, 0, 0, 255, 0, 0);
-	// Left
-	//GRAPHICS::DRAW_RECT(lineLeft - (outline * 0.5f), centerY, outline, lineHeight, 0, 0, 0, 255, 0, 0);
-	// Right
-	GRAPHICS::DRAW_RECT(lineLeft + lineWidth + (outline * 0.5f), centerY, outline, lineHeight, 0, 0, 0, 255, 0, 0);
-}
+#include <sysinfoapi.h>
+#include <string>
 
 void MenuItemBase::WaitAndDraw(int ms)
 {
@@ -57,10 +37,10 @@ void MenuItemBase::OnDraw(float lineTop, float lineLeft, bool active)
 	UI::SET_TEXT_COLOR_RGBA(color.r, color.g, color.b, color.a);
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	DrawText(lineLeft + m_textLeft, lineTop + m_lineHeight / 4.5f, const_cast<char*>(GetCaption().c_str()));
+	DrawUtils::DrawText(lineLeft + m_textLeft, lineTop + m_lineHeight / 4.5f, const_cast<char*>(GetCaption().c_str()));
 	// rect
 	color = m_colorRect.adjustBrightness(active ? 1.25 : 1);
-	DrawRect(lineLeft, lineTop, m_lineWidth, m_lineHeight, color.r, color.g, color.b, color.a);
+	DrawUtils::DrawRect(lineLeft, lineTop, m_lineWidth, m_lineHeight, color);
 }
 
 void MenuItemSwitchable::OnDraw(float lineTop, float lineLeft, bool active)
@@ -73,7 +53,7 @@ void MenuItemSwitchable::OnDraw(float lineTop, float lineLeft, bool active)
 	UI::SET_TEXT_COLOR_RGBA(color.r, color.g, color.b, static_cast<int>(color.a / 1.1f));
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	DrawText(lineLeft + lineWidth - lineWidth / 6.35f, lineTop + lineHeight / 4.8f, GetState() ? "[Y]" : "[N]");
+	DrawUtils::DrawText(lineLeft + lineWidth - lineWidth / 6.35f, lineTop + lineHeight / 4.8f, GetState() ? "[Y]" : "[N]");
 }
 
 void MenuItemMenu::OnDraw(float lineTop, float lineLeft, bool active)
@@ -86,7 +66,7 @@ void MenuItemMenu::OnDraw(float lineTop, float lineLeft, bool active)
 	UI::SET_TEXT_COLOR_RGBA(color.r, color.g, color.b, color.a / 2);
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	DrawText(lineLeft + lineWidth - lineWidth / 8, lineTop + lineHeight / 3.5f, "*");
+	DrawUtils::DrawText(lineLeft + lineWidth - lineWidth / 8, lineTop + lineHeight / 3.5f, "*");
 }
 
 void MenuItemMenu::OnSelect()
@@ -210,14 +190,6 @@ void MenuController::DrawStatusText()
 		UI::SET_TEXT_COLOR_RGBA(255, 255, 255, 255);
 		UI::SET_TEXT_CENTRE(1);
 		UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-		DrawText(0.5, 0.5, const_cast<char*>(m_statusText.c_str()));
+		DrawUtils::DrawText(0.5, 0.5, const_cast<char*>(m_statusText.c_str()));
 	}
-}
-
-ColorRgba ColorRgba::adjustBrightness(double factor) const
-{
-	auto adjust = [factor](byte c) -> byte {
-		return static_cast<byte>((std::max)(0.0, (std::min)(255.0, c * factor)));
-	};
-	return ColorRgba{ adjust(r), adjust(g), adjust(b), a };
 }

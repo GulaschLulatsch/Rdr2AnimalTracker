@@ -3,8 +3,8 @@
 // Generated Tue, 12 Nov 2024 11:33:23 GMT
 // https://alloc8or.re/rdr3/nativedb/
 
-#include "types.h"
 #include "nativeCaller.h"
+#include "types.h"
 
 #ifndef NATIVE_DECL
 #if defined(_MSC_VER)

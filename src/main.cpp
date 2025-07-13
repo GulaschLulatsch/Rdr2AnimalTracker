@@ -1,7 +1,10 @@
-#include "..\inc\main.h"
-#include "animalsFinder.h"
-#include "scriptmenu.h"
-#include "keyboard.h"
+#include "RDR2ScriptHook\main.h"
+
+#include "AnimalsFinder.h"
+#include "Keyboard.h"
+
+#include <minwindef.h>
+#include <winnt.h>
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {
