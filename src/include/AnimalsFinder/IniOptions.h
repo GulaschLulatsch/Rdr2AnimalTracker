@@ -1,7 +1,8 @@
 #pragma once
 
-#include "..\inc\types.h"
-#include "..\iniReader\SimpleIni.h"
+#include "RDR2ScriptHook\types.h"
+
+#include "SimpleIni\SimpleIni.h"
 
 #include <map>
 #include <string>
@@ -20,7 +21,7 @@ public:
 private:
 	static bool getBoolIniValue(const char* value);
 
-	static char const* const const sectionName;
+	static char const* const sectionName;
 
 	CSimpleIniA generalIni{};
 	bool showBirds{ false };

@@ -1,11 +1,11 @@
-﻿#include "animalsfinder.h"
+﻿#include "AnimalsFinder.h"
 
-#include "scriptmenu.h"
+#include "ScriptMenu.h"
 
-#include "../inc/enums.h"
-#include "../inc/main.h"
-#include "../inc/natives.h"
-#include "../inc/types.h"
+#include "RDR2ScriptHook/enums.h"
+#include "RDR2ScriptHook/main.h"
+#include "RDR2ScriptHook/natives.h"
+#include "RDR2ScriptHook/types.h"
 
 #include <memory>
 #include <set>
@@ -46,75 +46,11 @@ void AnimalsFinder::update()
 	int count = worldGetAllPeds(peds.data(), ARR_SIZE);
 	peds.resize(count);
 
-	static const Hash unknownAnimalTypeMagicValue{ 4141559444 };
 
 	std::set<Ped> currentBlips;
 	for (Ped ped: peds)
 	{
-		if (PED::IS_PED_HUMAN(ped))
-			continue;
-
-		Hash animalType{ ENTITY::_GET_PED_ANIMAL_TYPE(ped) };
-		if (animalType == unknownAnimalTypeMagicValue) { // what the fuck is this magic value??
-			continue;
-		}
-
-		bool isBird{ static_cast<bool>(ENTITY::_GET_IS_BIRD(ped)) };
-		if (!iniOptions.getShowBirds() && isBird) {
-			continue;
-		}
-
-		if (animalsNames.find(animalType) == animalsNames.end()) {
-			continue;
-		}
-
-		Vector3 animCords = ENTITY::GET_ENTITY_COORDS(ped, TRUE, FALSE);
-		Vector3 plv = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), TRUE, FALSE);
-		float dist = MISC::GET_DISTANCE_BETWEEN_COORDS(plv.x, plv.y, plv.z, animCords.x, animCords.y, animCords.z, FALSE);
-
-		int quality = PED::_GET_PED_QUALITY(ped);
-		bool qualityMatches = qualityMatchesIni(quality);
-
-		auto iterator = blips.find(ped);
-		if (iterator != blips.end()) {
-			if (qualityMatches) {
-				MAP::SET_BLIP_COORDS(iterator->second, animCords.x, animCords.y, animCords.z);
-				currentBlips.insert(ped);
-			}
-			else {
-				MAP::REMOVE_BLIP(&iterator->second); // TODO also remove from blips?
-			}
-			continue;
-		}
-		if (!qualityMatches) {
-			continue;
-		}
-		static const Hash unknownBlipHash{ 0x63351D54 };
-		Blip animalBlip = MAP::BLIP_ADD_FOR_ENTITY(unknownBlipHash, ped);
-		blips.insert({ ped, animalBlip });
-		currentBlips.insert(ped);
-
-		if (quality <= ePedQuality::PQ_LOW ) {
-			static const Hash blipModifierArea_solidWhite{ 0xA2814CC7 };
-			MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierArea_solidWhite);
-		}
-		else if (quality == ePedQuality::PQ_MEDIUM) {
-			static const Hash blipModifierDebugBlue_solidBlue{ 0xF91DD38D };
-			MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugBlue_solidBlue);
-		}
-		else {
-			static const Hash blipModifierDebugYellow_solidYellow{ 0xA5C4F725 };
-			MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugYellow_solidYellow);
-		}
-
-		static const Hash animalTexture{ 0x9DE00913 };
-		static const Hash fishTexture{ 0xA216510E };
-		static const Hash smallDotTexture{ 0x000A9056 };
-		MAP::SET_BLIP_SPRITE(animalBlip, isBird ? smallDotTexture : animalTexture, true);
-		MAP::SET_BLIP_SCALE(animalBlip, 0.8);
-
-		//MAP::_SET_BLIP_NAME(animalBlip, HUD::GET_STRING_FROM_HASH_KEY(animalType));
-		MAP::_SET_BLIP_NAME(animalBlip, animalsNames.at(animalType).c_str()); 
+		updateBlipForPed(ped, currentBlips);
 	}
 
 
@@ -127,7 +63,74 @@ void AnimalsFinder::update()
 	}
 }
 
-bool AnimalsFinder::qualityMatchesIni(int quality)
+void AnimalsFinder::updateBlipForPed(Ped ped, std::set<Blip>& currentBlips)
+{
+	if (PED::IS_PED_HUMAN(ped))
+		return;
+
+	Hash animalType{ ENTITY::_GET_PED_ANIMAL_TYPE(ped) };
+
+	static const Hash unknownAnimalTypeMagicValue{ 4141559444 };
+	if (animalType == unknownAnimalTypeMagicValue) { // what the fuck is this magic value??
+		return;
+	}
+
+	bool isBird{ static_cast<bool>(ENTITY::_GET_IS_BIRD(ped)) };
+	if (!iniOptions.getShowBirds() && isBird) {
+		return;
+	}
+
+	if (animalsNames.find(animalType) == animalsNames.end()) {
+		return;
+	}
+
+	int quality = PED::_GET_PED_QUALITY(ped);
+	bool qualityMatches = qualityMatchesIni(quality);
+
+	auto iterator = blips.find(ped);
+	if (iterator != blips.end()) { // Blip already exists for Ped
+		if (qualityMatches) { // Update coordinates
+			Vector3 animCords = ENTITY::GET_ENTITY_COORDS(ped, TRUE, FALSE);
+			MAP::SET_BLIP_COORDS(iterator->second, animCords.x, animCords.y, animCords.z);
+			currentBlips.insert(ped);
+		}
+		else { // Remove Blip (This happens when animal quality changes between tick, ie. after being shot)
+			MAP::REMOVE_BLIP(&iterator->second); 
+		}
+		return;
+	}
+	if (!qualityMatches) {
+		return;
+	}
+	static const Hash unknownBlipHash{ 0x63351D54 };
+	Blip animalBlip = MAP::BLIP_ADD_FOR_ENTITY(unknownBlipHash, ped);
+	blips.insert({ ped, animalBlip });
+	currentBlips.insert(ped);
+
+	if (quality <= ePedQuality::PQ_LOW) {
+		static const Hash blipModifierArea_solidWhite{ 0xA2814CC7 };
+		MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierArea_solidWhite);
+	}
+	else if (quality == ePedQuality::PQ_MEDIUM) {
+		static const Hash blipModifierDebugBlue_solidBlue{ 0xF91DD38D };
+		MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugBlue_solidBlue);
+	}
+	else {
+		static const Hash blipModifierDebugYellow_solidYellow{ 0xA5C4F725 };
+		MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugYellow_solidYellow);
+	}
+
+	static const Hash animalTexture{ 0x9DE00913 };
+	static const Hash fishTexture{ 0xA216510E };
+	static const Hash smallDotTexture{ 0x000A9056 };
+	MAP::SET_BLIP_SPRITE(animalBlip, isBird ? smallDotTexture : animalTexture, true);
+	MAP::SET_BLIP_SCALE(animalBlip, 0.8);
+
+	//MAP::_SET_BLIP_NAME(animalBlip, HUD::GET_STRING_FROM_HASH_KEY(animalType));
+	MAP::_SET_BLIP_NAME(animalBlip, animalsNames.at(animalType).c_str());
+}
+
+bool AnimalsFinder::qualityMatchesIni(int quality) const
 {
 	if ((quality <= ePedQuality::PQ_LOW) && iniOptions.getShowPoorQuality()) {
 		return true;

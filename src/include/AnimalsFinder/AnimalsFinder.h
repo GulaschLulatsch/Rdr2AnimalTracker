@@ -2,8 +2,10 @@
 
 #include "IniOptions.h"
 
-#include "../inc/types.h"
+#include "RDR2ScriptHook/types.h"
+
 #include <map>
+#include <set>
 #include <string>
 
 class AnimalsFinder
@@ -15,7 +17,9 @@ public:
 private:
 	void update();
 
-	bool qualityMatchesIni(int quality);
+	void updateBlipForPed(Ped ped, std::set<Blip>& currentBlips);
+
+	bool qualityMatchesIni(int quality) const;
 
 	static void removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash);
 
