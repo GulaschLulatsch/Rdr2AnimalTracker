@@ -12,7 +12,7 @@ class IniOptions
 public:
 	IniOptions( std::string const& generalInifile);
 
-	std::map<Hash, std::string> getAnimalsNames() const;
+	std::map<Hash, std::string> getAnimalNames() const;
 	bool getShowBirds() const;
 	bool getShowExcellentQuality() const;
 	bool getShowMediumQuality() const;

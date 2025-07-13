@@ -1,21 +1,23 @@
 #include "MenuBase.h"
 
-#include "ScriptMenu.h"
+#include "MenuItemTitle.h"
+#include "MenuInput.h"
+#include "MenuController.h"
 
 #include <memory>
 #include <type_traits>
 #include <vector>
 
 const float MenuBase::MENU_TOP{ 0.05f };
-const float MenuBase::MENU_LEFT{ 0.f },
-const float MenuBase::ROW_MARGIN{ 10.f/1080.f }; //10 pixel at 1080p
+const float MenuBase::MENU_LEFT{ 0.f };
+const float MenuBase::ROW_MARGIN{ 10.0f / 1080.0f }; //10 pixel at 1080p
 const size_t MenuBase::ROWS_PER_SCREEN{ 11 };
 
 MenuBase::MenuBase(std::unique_ptr<MenuItemTitle> itemTitle):
 	m_itemTitle{ std::move(itemTitle) }
 {}
 
-void MenuBase::AddItem(std::unique_ptr<MenuItemBase> item) {
+void MenuBase::AddItem(std::unique_ptr<IMenuItem> item) {
 	item->SetMenu(this); 
 	m_items.emplace_back(std::move(item));
 }
@@ -33,21 +35,17 @@ MenuController* MenuBase::GetController() const
 	return m_controller;
 }
 
-std::vector<std::unique_ptr<MenuItemBase>> const& MenuBase::GetItems() const
+std::vector<std::unique_ptr<IMenuItem>> const& MenuBase::GetItems() const
 {
 	return m_items;
 }
 
 void MenuBase::OnDraw() const
 {
-	if (m_itemTitle->GetClass() == eMenuItemClass::ListTitle) {
-		reinterpret_cast<MenuItemListTitle*>(m_itemTitle.get())->SetCurrentItemInfo(GetActiveItemIndex() + 1, static_cast<int>(m_items.size()));
-	}
-
 	float lineTop = MENU_TOP;
 	float lineLeft = MENU_LEFT;
 	m_itemTitle->OnDraw(lineTop, lineLeft, false);
-	lineTop += m_itemTitle->GetLineHeight() + ROW_MARGIN;
+	lineTop += m_itemTitle->GetItemHeight() + ROW_MARGIN;
 	for (size_t i = 0; i < ROWS_PER_SCREEN; i++)
 	{
 		size_t itemIndex = (m_activeScreenIndex * ROWS_PER_SCREEN) + i;
@@ -56,7 +54,7 @@ void MenuBase::OnDraw() const
 		}
 		auto const& item = m_items.at(itemIndex);
 		item->OnDraw(lineTop, lineLeft, m_activeRowIndex == i);
-		lineTop += item->GetLineHeight() + ROW_MARGIN;
+		lineTop += item->GetItemHeight() + ROW_MARGIN;
 	}
 }
 
@@ -79,7 +77,7 @@ int MenuBase::OnInput()
 	int waitTime = 0;
 
 	//wtf does this if bracket do?
-	if (buttons.a || buttons.b || buttons.up || buttons.down)
+	if (buttons.a || buttons.b || buttons.up || buttons.down || buttons.l || buttons.r)
 	{
 		waitTime = buttons.b ? 200 : 150;
 	}
@@ -94,6 +92,16 @@ int MenuBase::OnInput()
 			m_controller->PopMenu();
 			return waitTime;
 		}
+	}
+	if (buttons.l) {
+		if (m_controller) {
+			m_controller->PopMenu();
+			return waitTime;
+		}
+	}
+	if (buttons.r) {
+		m_items.at(GetActiveItemIndex())->OnRight();
+		return waitTime;
 	}
 	if (buttons.up){
 		if (m_activeRowIndex == 0){

@@ -28,9 +28,9 @@ bool IniOptions::getBoolIniValue(const char* value) {
 	return (value != nullptr) && (std::string(value) == "true");
 }
 
-std::map<Hash, std::string> IniOptions::getAnimalsNames() const
+std::map<Hash, std::string> IniOptions::getAnimalNames() const
 {
-	std::string langFilePath{ std::string{ "AnimalsFinder/" } + generalIni.GetValue(sectionName, "langFilePath", "eng.ini") };
+	std::string langFilePath{ std::string{ "AnimalFinder/" } + generalIni.GetValue(sectionName, "langFilePath", "eng.ini") };
 
 	CSimpleIniA LangIni;
 	if(LangIni.LoadFile(langFilePath.c_str()) < 0) {
@@ -41,16 +41,16 @@ std::map<Hash, std::string> IniOptions::getAnimalsNames() const
 	CSimpleIniA::TNamesDepend keys;
 	LangIni.GetAllKeys("LANG", keys);
 
-	std::map<Hash, std::string> animalsNames;
+	std::map<Hash, std::string> animalNames;
 
 	// Iterate through keys and get their values
 	for (const auto& key : keys) {
 		const char* value = LangIni.GetValue("LANG", key.pItem, "undefinded");
 
-		animalsNames.insert({ typetoHash.at(key.pItem), std::string(value) });
+		animalNames.insert({ typetoHash.at(key.pItem), std::string(value) });
 	}
 
-	return animalsNames;
+	return animalNames;
 }
 
 

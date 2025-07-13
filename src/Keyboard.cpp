@@ -9,7 +9,7 @@ struct {
 	BOOL isUpNow;
 } keyStates[KEYS_SIZE];
 
-void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow)
+void Keyboard::OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow)
 {
 	if (key < KEYS_SIZE)
 	{
@@ -22,17 +22,17 @@ void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, 
 
 const int NOW_PERIOD = 100, MAX_DOWN = 5000, MAX_DOWN_LONG = 30000; // ms
 
-bool IsKeyDown(DWORD key)
+bool Keyboard::IsKeyDown(DWORD key)
 {
 	return (key < KEYS_SIZE) ? ((GetTickCount64() < keyStates[key].time + MAX_DOWN) && !keyStates[key].isUpNow) : false;
 }
 
-bool IsKeyDownLong(DWORD key)
+bool Keyboard::IsKeyDownLong(DWORD key)
 {
 	return (key < KEYS_SIZE) ? ((GetTickCount64() < keyStates[key].time + MAX_DOWN_LONG) && !keyStates[key].isUpNow) : false;
 }
 
-bool IsKeyJustUp(DWORD key, bool exclusive)
+bool Keyboard::IsKeyJustUp(DWORD key, bool exclusive)
 {
 	bool b = (key < KEYS_SIZE) ? (GetTickCount64() < keyStates[key].time + NOW_PERIOD && keyStates[key].isUpNow) : false;
 	if (b && exclusive)
@@ -40,7 +40,7 @@ bool IsKeyJustUp(DWORD key, bool exclusive)
 	return b;
 }
 
-void ResetKeyState(DWORD key)
+void Keyboard::ResetKeyState(DWORD key)
 {
 	if (key < KEYS_SIZE)
 		memset(&keyStates[key], 0, sizeof(keyStates[0]));
