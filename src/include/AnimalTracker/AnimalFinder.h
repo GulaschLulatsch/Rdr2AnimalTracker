@@ -8,10 +8,10 @@
 #include <set>
 #include <string>
 
-class AnimalsFinder
+class AnimalFinder
 {
 public:
-	AnimalsFinder();
+	AnimalFinder();
 	void run();
 
 private:
@@ -27,7 +27,7 @@ private:
 
 	IniOptions iniOptions;
 	std::map<Ped, Blip> blips{};
-	std::map<Hash, std::string> animalsNames;
+	std::map<Hash, std::string> animalNames;
 };
 
 
