@@ -25,6 +25,9 @@
     <ClCompile Include="..\external\SimpleIni\src\ConvertUTF.c">
       <Filter>SimpleIni Files</Filter>
     </ClCompile>
+    <ClCompile Include="MenuBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AnimalsFinder\AnimalsFinder.h">
@@ -53,6 +56,9 @@
     </ClInclude>
     <ClInclude Include="..\external\SimpleIni\include\SimpleIni\SimpleIni.h">
       <Filter>SimpleIni Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimalsFinder\MenuBase.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
