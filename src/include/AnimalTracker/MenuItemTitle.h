@@ -14,7 +14,6 @@ public:
 	EMenuItemType GetClass() const override; 
 	std::string GetCaption() const override;
 
-	void OnFrame() const override;
 	void OnSelect() override;
 	void OnRight() override;
 

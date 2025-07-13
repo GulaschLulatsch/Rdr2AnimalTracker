@@ -58,13 +58,6 @@ void MenuBase::OnDraw() const
 	}
 }
 
-
-void MenuBase::OnFrame() const{
-	for (auto& item : m_items) {
-		item->OnFrame();
-	}
-}
-
 int MenuBase::OnInput()
 {
 	const size_t itemCount = m_items.size();
