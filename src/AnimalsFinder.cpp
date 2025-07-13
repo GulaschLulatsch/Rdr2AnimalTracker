@@ -1,6 +1,7 @@
 ﻿#include "AnimalsFinder.h"
 
 #include "ScriptMenu.h"
+#include "MenuBase.h"
 
 #include "RDR2ScriptHook/enums.h"
 #include "RDR2ScriptHook/main.h"
@@ -146,7 +147,7 @@ bool AnimalsFinder::qualityMatchesIni(int quality) const
 
 std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, map<Hash, std::string>& animalsNames, map<Hash, std::string>& selectedAnimals)
 {
-	auto menu = std::make_unique<MenuBase>(new MenuItemTitle("ANIMALS FINDER"));
+	auto menu = std::make_unique<MenuBase>(MenuItemTitle("ANIMALS FINDER"));
 	controller.RegisterMenu(menu.get());
 
 	menu->AddItem(new MenuItemFlush("Flush", animalsNames, &animalsNames, &selectedAnimals));

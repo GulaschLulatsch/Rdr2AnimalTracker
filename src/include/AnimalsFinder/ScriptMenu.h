@@ -13,9 +13,6 @@
 
 using namespace std;
 
-class MenuBase;
-class MenuController;
-
 enum eMenuItemClass
 {
 	Base,
@@ -162,45 +159,6 @@ public:
 	virtual	void OnSelect();
 };
 
-const int
-MenuBase_linesPerScreen = 11;
-
-const float
-MenuBase_menuTop = 0.05f,
-MenuBase_menuLeft = 0.0f,
-MenuBase_lineOverlap = 1.0f / 40.0f;
-
-class MenuBase
-{
-	MenuItemTitle* m_itemTitle;
-	vector<MenuItemBase*>		m_items;
-
-	int		m_activeLineIndex;
-	int		m_activeScreenIndex;
-
-	MenuController* m_controller{ nullptr };
-public:
-	MenuBase(MenuItemTitle* itemTitle)
-		: m_itemTitle(itemTitle),
-		m_activeLineIndex(0), m_activeScreenIndex(0) {}
-	~MenuBase()
-	{
-		for each (auto item in m_items)
-			delete item;
-	}
-	void AddItem(MenuItemBase* item) { item->SetMenu(this); m_items.push_back(item); }
-	int GetActiveItemIndex() { return m_activeScreenIndex * MenuBase_linesPerScreen + m_activeLineIndex; }
-	void OnDraw();
-	int OnInput();
-	void OnFrame()
-	{
-		for (size_t i = 0; i < m_items.size(); i++)
-			m_items[i]->OnFrame();
-	}
-	void SetController(MenuController* controller) { m_controller = controller; }
-	MenuController* GetController() { return m_controller; }
-	vector<MenuItemBase*> GetItems() { return m_items; }
-};
 
 class MenuItemFlush : public MenuItemDefault {
 	map<Hash, std::string> oldAnimalsNames;
@@ -253,9 +211,6 @@ public:
 			IsKeyDown(VK_NUMPAD6) || (IsKeyDownLong(VK_CONTROL) && IsKeyDown(VK_RIGHT)),
 			IsKeyDown(VK_NUMPAD4) || (IsKeyDownLong(VK_CONTROL) && IsKeyDown(VK_LEFT))
 		};
-	}
-	static void MenuInputBeep()
-	{
 	}
 };
 

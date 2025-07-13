@@ -14,6 +14,7 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="AnimalsFinder.cpp" />
+    <ClCompile Include="MenuBase.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -23,6 +24,7 @@
     <ClInclude Include="include\AnimalsFinder\DrawUtils.h" />
     <ClInclude Include="include\AnimalsFinder\IniOptions.h" />
     <ClInclude Include="include\AnimalsFinder\Keyboard.h" />
+    <ClInclude Include="include\AnimalsFinder\MenuBase.h" />
     <ClInclude Include="include\AnimalsFinder\NamesInfo.h" />
     <ClInclude Include="include\AnimalsFinder\AnimalsFinder.h" />
     <ClInclude Include="include\AnimalsFinder\ScriptMenu.h" />
