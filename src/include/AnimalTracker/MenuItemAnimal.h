@@ -20,7 +20,6 @@ public:
 	);
 
 	EMenuItemType GetClass() const override;
-	void OnFrame() const override;
 	void OnSelect() override;
 	void OnRight() override;
 

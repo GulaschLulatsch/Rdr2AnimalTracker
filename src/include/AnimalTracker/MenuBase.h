@@ -21,7 +21,6 @@ public:
 	const std::vector<std::unique_ptr<IMenuItem>>& GetItems() const;
 
 	void OnDraw() const;
-	void OnFrame() const;
 	int OnInput();
 
 private:

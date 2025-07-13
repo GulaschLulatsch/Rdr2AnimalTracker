@@ -14,7 +14,6 @@ public:
 	virtual EMenuItemType GetClass() const = 0;
 
 	virtual void OnDraw(float lineTop, float lineLeft, bool active) const = 0;
-	virtual	void OnFrame() const = 0;
 	virtual	void OnSelect() = 0;
 	virtual	void OnRight() = 0;
 

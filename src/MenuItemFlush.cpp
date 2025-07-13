@@ -30,8 +30,5 @@ EMenuItemType MenuItemFlush::GetClass() const
 	return EMenuItemType::Flush;
 }
 
-void MenuItemFlush::OnFrame() const
-{ /*Do nothing*/ }
-
 void MenuItemFlush::OnRight()
 { /*Do nothing*/ }

@@ -32,8 +32,5 @@ EMenuItemType MenuItemAnimal::GetClass() const
 	return EMenuItemType::Animal;
 }
 
-void MenuItemAnimal::OnFrame() const
-{ /*Do nothing*/ }
-
 void MenuItemAnimal::OnRight()
 { /*Do nothing*/ }

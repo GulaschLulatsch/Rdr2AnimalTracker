@@ -30,9 +30,6 @@ std::string MenuItemTitle::GetCaption() const
 	return m_caption;
 }
 
-void MenuItemTitle::OnFrame() const
-{ /*Do nothing on frame*/ }
-
 void MenuItemTitle::OnSelect()
 { /*Title should be unable to get selected*/ }
 
