@@ -1,15 +1,16 @@
 #include "IniOptions.h"
 
+#include "AnimalInfo.h"
 #include "NamesInfo.h"
+#include "QualityFilter.h"
 
 #include "RDR2ScriptHook/types.h"
 
 #include "SimpleIni/SimpleIni.h"
 
-#include <cstdio>
-#include <map>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 
 char const * const IniOptions::sectionName{ "GENERAL" };
 
@@ -28,9 +29,9 @@ bool IniOptions::getBoolIniValue(const char* value) {
 	return (value != nullptr) && (std::string(value) == "true");
 }
 
-std::map<Hash, std::string> IniOptions::getAnimalNames() const
+std::unordered_map<Hash, AnimalInfo> IniOptions::getAnimalNames() const
 {
-	std::string langFilePath{ std::string{ "AnimalFinder/" } + generalIni.GetValue(sectionName, "langFilePath", "eng.ini") };
+	std::string langFilePath{ std::string{ "AnimalsFinder/" } + generalIni.GetValue(sectionName, "langFilePath", "eng.ini") };
 
 	CSimpleIniA LangIni;
 	if(LangIni.LoadFile(langFilePath.c_str()) < 0) {
@@ -41,16 +42,29 @@ std::map<Hash, std::string> IniOptions::getAnimalNames() const
 	CSimpleIniA::TNamesDepend keys;
 	LangIni.GetAllKeys("LANG", keys);
 
-	std::map<Hash, std::string> animalNames;
+	std::unordered_map<Hash, AnimalInfo> animalInfos;
 
 	// Iterate through keys and get their values
 	for (const auto& key : keys) {
 		const char* value = LangIni.GetValue("LANG", key.pItem, "undefinded");
 
-		animalNames.insert({ typetoHash.at(key.pItem), std::string(value) });
+		Hash animalHash = typetoHash.at(key.pItem);
+		animalInfos.insert({ 
+			animalHash, 
+			AnimalInfo{
+				animalHash, 
+				value, 
+				fish.count(animalHash) > 0, 
+				QualityFilter{ /*TODO read saved quality*/
+					showPoorQuality,
+					showMediumQuality,
+					showExcellentQuality
+				}
+			} 
+		});
 	}
 
-	return animalNames;
+	return animalInfos;
 }
 
 

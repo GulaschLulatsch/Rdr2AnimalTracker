@@ -1,8 +1,10 @@
 #include "MenuItemTitle.h"
 
-const float MenuItemTitle::ITEM_WIDTH{ 0.30f };
-const float MenuItemTitle::ITEM_HEIGHT{ 0.06f };
-const float MenuItemTitle::TEXT_LEFT_MARGIN{ 0.08f };
+#include "ColorRgba.h"
+#include "EMenuItemType.h"
+#include "MenuItemBase.h"
+
+#include <string>
 
 const ColorRgba MenuItemTitle::RECT_COLOR{ 0, 0, 0, 255 };
 const ColorRgba MenuItemTitle::TEXT_COLOR{ 100, 0, 0, 255 };

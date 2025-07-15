@@ -2,9 +2,11 @@
 
 #include "RDR2ScriptHook\types.h"
 
+#include "AnimalInfo.h"
+
 #include "SimpleIni\SimpleIni.h"
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
 class IniOptions
@@ -12,7 +14,7 @@ class IniOptions
 public:
 	IniOptions( std::string const& generalInifile);
 
-	std::map<Hash, std::string> getAnimalNames() const;
+	std::unordered_map<Hash, AnimalInfo> getAnimalNames() const;
 	bool getShowBirds() const;
 	bool getShowExcellentQuality() const;
 	bool getShowMediumQuality() const;
