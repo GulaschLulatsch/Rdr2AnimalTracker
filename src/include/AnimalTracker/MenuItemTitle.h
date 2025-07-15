@@ -18,9 +18,9 @@ public:
 	void OnRight() override;
 
 private:
-	static const float ITEM_WIDTH;
-	static const float ITEM_HEIGHT;
-	static const float TEXT_LEFT_MARGIN; 
+	static constexpr const float ITEM_WIDTH{ 0.30f };
+	static constexpr const float ITEM_HEIGHT{ 0.06f };
+	static constexpr const float TEXT_LEFT_MARGIN{ 0.08f };
 
 	static const ColorRgba RECT_COLOR;
 	static const ColorRgba TEXT_COLOR;

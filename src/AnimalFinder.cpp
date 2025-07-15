@@ -1,30 +1,35 @@
 ﻿#include "AnimalFinder.h"
 
+#include "AnimalInfo.h"
 #include "MenuBase.h"
-#include "MenuItemTitle.h"
-#include "MenuItemFlush.h"
-#include "MenuItemAnimal.h"
 #include "MenuController.h"
 #include "MenuInput.h"
+#include "MenuItemAnimal.h"
+#include "MenuItemTitle.h"
 
-#include "RDR2ScriptHook/enums.h"
-#include "RDR2ScriptHook/main.h"
-#include "RDR2ScriptHook/natives.h"
-#include "RDR2ScriptHook/types.h"
+#include <RDR2ScriptHook/enums.h>
+#include <RDR2ScriptHook/main.h>
+#include <RDR2ScriptHook/natives.h>
+#include <RDR2ScriptHook/types.h>
 
+#include <algorithm>
+#include <map>
 #include <memory>
-#include <set>
+#include <minwindef.h>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 DWORD	vehUpdateTime;
 DWORD	pedUpdateTime;
 
-std::string const AnimalFinder::iniFilePath{ "AnimalFinder/AnimalFinder.ini" };
+std::string const AnimalFinder::iniFilePath{ "AnimalsFinder/AnimalsFinder.ini" };
 
 AnimalFinder::AnimalFinder() :
 	iniOptions{ iniFilePath },
-	animalNames{ iniOptions.getAnimalNames() }
+	animalInfos{ iniOptions.getAnimalNames() }
 {}
 
 void AnimalFinder::removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash) {
@@ -52,7 +57,7 @@ void AnimalFinder::update()
 	peds.resize(count);
 
 
-	std::set<Ped> currentBlips;
+	std::unordered_set<Blip> currentBlips;
 	for (Ped ped: peds)
 	{
 		updateBlipForPed(ped, currentBlips);
@@ -68,7 +73,7 @@ void AnimalFinder::update()
 	}
 }
 
-void AnimalFinder::updateBlipForPed(Ped ped, std::set<Blip>& currentBlips)
+void AnimalFinder::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips)
 {
 	if (PED::IS_PED_HUMAN(ped))
 		return;
@@ -85,12 +90,13 @@ void AnimalFinder::updateBlipForPed(Ped ped, std::set<Blip>& currentBlips)
 		return;
 	}
 
-	if (animalNames.find(animalType) == animalNames.end()) {
+	if (animalInfos.find(animalType) == animalInfos.end()) {
 		return;
 	}
 
-	int quality = PED::_GET_PED_QUALITY(ped);
-	bool qualityMatches = qualityMatchesIni(quality);
+	AnimalInfo const& animalInfo{ animalInfos.at(animalType) };
+	ePedQuality quality = static_cast<ePedQuality>(PED::_GET_PED_QUALITY(ped));
+	bool qualityMatches = animalInfo.QualityMatches(quality);
 
 	auto iterator = blips.find(ped);
 	if (iterator != blips.end()) { // Blip already exists for Ped
@@ -112,6 +118,7 @@ void AnimalFinder::updateBlipForPed(Ped ped, std::set<Blip>& currentBlips)
 	blips.insert({ ped, animalBlip });
 	currentBlips.insert(ped);
 
+
 	if (quality <= ePedQuality::PQ_LOW) {
 		static const Hash blipModifierArea_solidWhite{ 0xA2814CC7 };
 		MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierArea_solidWhite);
@@ -127,12 +134,12 @@ void AnimalFinder::updateBlipForPed(Ped ped, std::set<Blip>& currentBlips)
 
 	static const Hash animalTexture{ 0x9DE00913 };
 	static const Hash fishTexture{ 0xA216510E };
-	static const Hash smallDotTexture{ 0x000A9056 };
-	MAP::SET_BLIP_SPRITE(animalBlip, isBird ? smallDotTexture : animalTexture, true);
+	static const Hash smallDotTexture{ 0x000A9056 }; // TODO load custom bird texture
+	MAP::SET_BLIP_SPRITE(animalBlip, isBird ? smallDotTexture : animalInfo.IsFish() ? fishTexture : animalTexture, true);
 	MAP::SET_BLIP_SCALE(animalBlip, 0.8);
 
 	//MAP::_SET_BLIP_NAME(animalBlip, HUD::GET_STRING_FROM_HASH_KEY(animalType));
-	MAP::_SET_BLIP_NAME(animalBlip, animalNames.at(animalType).c_str());
+	MAP::_SET_BLIP_NAME(animalBlip, animalInfo.GetName().c_str());
 }
 
 bool AnimalFinder::qualityMatchesIni(int quality) const
@@ -149,25 +156,24 @@ bool AnimalFinder::qualityMatchesIni(int quality) const
 	return false;
 }
 
-std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, std::map<Hash, std::string>& animalNames, std::map<Hash, std::string>& selectedAnimals)
+std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, std::unordered_map<Hash, AnimalInfo>& animalInfos)
 {
 	auto menu = std::make_unique<MenuBase>(std::make_unique<MenuItemTitle>("ANIMALS FINDER"));
 	controller.RegisterMenu(menu.get());
 
-	menu->AddItem(std::make_unique<MenuItemFlush>("Flush", animalNames, &animalNames, &selectedAnimals));
-
-	std::vector<const std::pair<const Hash, std::string>*> sortedNames; // use vector of pointers to avoid unnecesssary copy
-	sortedNames.reserve(animalNames.size());
-	for (const auto& entry : animalNames) {
+	std::vector<std::pair<const Hash, AnimalInfo>*> sortedNames; // use vector of pointers to avoid unnecesssary copy
+	sortedNames.reserve(animalInfos.size());
+	for (auto& entry : animalInfos) {
 		sortedNames.push_back(&entry); // not sorted yet
 	}
 
 	std::sort(sortedNames.begin(), sortedNames.end(), [](const auto* a, const auto* b) {
-		return a->second < b->second;
+		return a->second.GetName() < b->second.GetName();
 	});
 
-	for (const auto& animal : sortedNames) {
-		menu->AddItem(std::make_unique<MenuItemAnimal>(animal->second, animal->first, &animalNames, &selectedAnimals));
+	for (auto& animal : sortedNames) {
+		AnimalInfo& animalInfo = animal->second;
+		menu->AddItem(std::make_unique<MenuItemAnimal>(animalInfo));
 	}
 
 	return menu;
@@ -176,8 +182,7 @@ std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, std::map<Ha
 void AnimalFinder::run()
 {
 	MenuController menuController{};
-	std::map<Hash, std::string> selectedAnimals{};
-	auto mainMenu = CreateMainMenu(menuController, animalNames, selectedAnimals);
+	auto mainMenu = CreateMainMenu(menuController, animalInfos);
 
 	while (true)
 	{
@@ -195,5 +200,10 @@ void AnimalFinder::run()
 void ScriptMain()
 {
 	AnimalFinder animalFinder;
-	animalFinder.run();
+	try {
+		animalFinder.run();
+	}
+	catch (...) {
+
+	}
 }

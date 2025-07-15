@@ -1,17 +1,14 @@
 #include "MenuBase.h"
 
-#include "MenuItemTitle.h"
-#include "MenuInput.h"
+#include "IMenuItem.h"
 #include "MenuController.h"
+#include "MenuInput.h"
+#include "MenuItemTitle.h"
 
 #include <memory>
 #include <type_traits>
 #include <vector>
 
-const float MenuBase::MENU_TOP{ 0.05f };
-const float MenuBase::MENU_LEFT{ 0.f };
-const float MenuBase::ROW_MARGIN{ 10.0f / 1080.0f }; //10 pixel at 1080p
-const size_t MenuBase::ROWS_PER_SCREEN{ 11 };
 
 MenuBase::MenuBase(std::unique_ptr<MenuItemTitle> itemTitle):
 	m_itemTitle{ std::move(itemTitle) }
@@ -125,6 +122,7 @@ int MenuBase::OnInput()
 			m_activeRowIndex = 0;
 			return waitTime;
 		}
+		m_activeRowIndex += 1;
 		return waitTime;
 	}
 

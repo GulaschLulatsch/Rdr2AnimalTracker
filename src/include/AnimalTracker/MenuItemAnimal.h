@@ -1,31 +1,22 @@
 #pragma once
 
+#include "AnimalInfo.h"
 #include "MenuItemDefault.h"
 
-#include "RDR2ScriptHook/natives.h"
-#include "RDR2ScriptHook/types.h"
-
-#include <string>
-#include <map>
+#include "EMenuItemType.h"
 
 class MenuItemAnimal : public MenuItemDefault
 {
 public:
-
 	MenuItemAnimal(
-		std::string const& caption,
-		Hash hash,
-		std::map<Hash, std::string>* animalNames,
-		std::map<Hash, std::string>* selectedAnimalNames
+		AnimalInfo& animalInfo
 	);
 
 	EMenuItemType GetClass() const override;
+	void OnDraw(float lineTop, float lineLeft, bool active) const override;
 	void OnSelect() override;
 	void OnRight() override;
 
 private:
-	Hash m_hash;
-	std::map<Hash, std::string>* m_animalNames;
-	std::map<Hash, std::string>* m_selectedAnimalNames;
-
+	AnimalInfo& m_animalInfo;
 };
