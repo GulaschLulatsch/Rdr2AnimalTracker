@@ -82,9 +82,7 @@ void IniOptions::StoreAnimalMap(std::unordered_map<Hash, AnimalInfo> const& anim
 		static_cast<void>(stateIni.SetLongValue(
 			animalSectionName,
 			std::to_string(entry.first).c_str(),
-			static_cast<long>(entry.second.GetQualityBitmask()),
-			entry.second.GetName().c_str(),
-			true
+			static_cast<long>(entry.second.GetQualityBitmask())
 		));
 		// TODO log this somewhere (logfile?)
 	}
@@ -100,9 +98,7 @@ void IniOptions::StoreAnimalInfos(std::vector<const AnimalInfo*> infos) const
 	static_cast<void>(stateIni.SetLongValue(
 		animalSectionName,
 		std::to_string(entry->GetHash()).c_str(),
-		static_cast<long>(entry->GetQualityBitmask()),
-		entry->GetName().c_str(),
-		true
+		static_cast<long>(entry->GetQualityBitmask())
 	));
 	stateIni.SaveFile(m_stateFilePath.c_str());
 }
