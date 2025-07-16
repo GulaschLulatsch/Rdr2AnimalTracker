@@ -25,6 +25,11 @@ bool QualityFilter::Matches(ePedQuality quality) const
 	return (m_filter & GOOD) > 0;
 }
 
+int QualityFilter::GetBitMask() const
+{
+	return m_filter;
+}
+
 void QualityFilter::Rotate(){
 	if (m_filter == (POOR | GOOD | PERFECT)) {
 		m_filter = 0;

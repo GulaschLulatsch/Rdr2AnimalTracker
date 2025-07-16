@@ -18,6 +18,7 @@ public:
 
 	Hash GetHash() const;
 	const std::string& GetName() const;
+	int GetQualityBitmask() const;
 
 	bool IsFish() const;
 

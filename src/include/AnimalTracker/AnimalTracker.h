@@ -9,18 +9,16 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class AnimalFinder
+class AnimalTracker
 {
 public:
-	AnimalFinder();
+	AnimalTracker();
 	void run();
 
 private:
 	void update();
 
 	void updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips);
-
-	bool qualityMatchesIni(int quality) const;
 
 	static void removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash);
 
