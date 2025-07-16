@@ -47,7 +47,7 @@ std::unordered_map<Hash, AnimalInfo> IniOptions::GetAnimalMap() const
 	CSimpleIniA stateIni;
 	stateIni.LoadFile(m_stateFilePath.c_str()); // error is fine, just use defaults instead
 
-	std::unordered_map<Hash, AnimalInfo> animalInfos;
+	std::unordered_map<Hash, AnimalInfo> m_animalInfos;
 
 	// Iterate through keys and get their values
 	for (const auto& key : keys) {
@@ -62,7 +62,7 @@ std::unordered_map<Hash, AnimalInfo> IniOptions::GetAnimalMap() const
 			))
 		};
 		long filterValue = qualityFilter.GetBitMask();
-		animalInfos.insert({ 
+		m_animalInfos.insert({ 
 			animalHash, 
 			AnimalInfo{
 				animalHash, 
@@ -72,8 +72,8 @@ std::unordered_map<Hash, AnimalInfo> IniOptions::GetAnimalMap() const
 			} 
 		});
 	}
-	StoreAnimalMap(animalInfos);
-	return animalInfos;
+	StoreAnimalMap(m_animalInfos);
+	return m_animalInfos;
 }
 
 void IniOptions::StoreAnimalMap(std::unordered_map<Hash, AnimalInfo> const& animalMap) const{
@@ -90,6 +90,21 @@ void IniOptions::StoreAnimalMap(std::unordered_map<Hash, AnimalInfo> const& anim
 	}
 	stateIni.SaveFile(m_stateFilePath.c_str());
 	// TODO log this somewhere (logfile?)
+}
+
+void IniOptions::StoreAnimalInfos(std::vector<const AnimalInfo*> infos) const
+{
+	CSimpleIniA stateIni;
+	stateIni.LoadFile(m_stateFilePath.c_str()); // error is fine, just write instead
+	for(auto const& entry: infos)
+	static_cast<void>(stateIni.SetLongValue(
+		animalSectionName,
+		std::to_string(entry->GetHash()).c_str(),
+		static_cast<long>(entry->GetQualityBitmask()),
+		entry->GetName().c_str(),
+		true
+	));
+	stateIni.SaveFile(m_stateFilePath.c_str());
 }
 
 std::string IniOptions::ExpandEnvironmentVariables(const std::string& input)

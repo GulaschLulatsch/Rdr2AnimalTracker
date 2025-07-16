@@ -5,12 +5,17 @@
 
 #include "EMenuItemType.h"
 
+#include <functional>
+
 class MenuItemAnimal : public MenuItemDefault
 {
 public:
 	MenuItemAnimal(
-		AnimalInfo& animalInfo
+		AnimalInfo& animalInfo,
+		std::function<void(AnimalInfo const&)> saveFunction
 	);
+
+	const AnimalInfo& GetAnimalInfo() const;
 
 	EMenuItemType GetClass() const override;
 	void OnDraw(float lineTop, float lineLeft, bool active) const override;
@@ -19,4 +24,5 @@ public:
 
 private:
 	AnimalInfo& m_animalInfo;
+	std::function<void(AnimalInfo const&)> m_saveFunction;
 };

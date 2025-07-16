@@ -1,5 +1,6 @@
 #include "MenuBase.h"
 
+#include "DrawUtils.h"
 #include "IMenuItem.h"
 #include "MenuController.h"
 #include "MenuInput.h"
@@ -10,9 +11,21 @@
 #include <vector>
 
 
-MenuBase::MenuBase(std::unique_ptr<MenuItemTitle> itemTitle):
-	m_itemTitle{ std::move(itemTitle) }
-{}
+MenuBase::MenuBase(
+	std::unique_ptr<MenuItemTitle> itemTitle,
+	float menuTop,
+	float menuLeft,
+	float itemWidth,
+	float itemHeight
+):
+	m_itemTitle{ std::move(itemTitle) },
+	m_menuTop{ menuTop },
+	m_menuLeft{ menuLeft },
+	m_itemWidth{ itemWidth },
+	m_itemHeight{ itemHeight }
+{
+	m_itemTitle->SetMenu(this);
+}
 
 void MenuBase::AddItem(std::unique_ptr<IMenuItem> item) {
 	item->SetMenu(this); 
@@ -37,10 +50,21 @@ std::vector<std::unique_ptr<IMenuItem>> const& MenuBase::GetItems() const
 	return m_items;
 }
 
+float MenuBase::GetItemsWidth() const
+{
+	return m_itemWidth;
+}
+
+float MenuBase::GetItemsHeight() const
+{
+	return m_itemHeight;
+}
+
 void MenuBase::OnDraw() const
 {
 	float lineTop = MENU_TOP;
 	float lineLeft = MENU_LEFT;
+
 	m_itemTitle->OnDraw(lineTop, lineLeft, false);
 	lineTop += m_itemTitle->GetItemHeight() + ROW_MARGIN;
 	for (size_t i = 0; i < ROWS_PER_SCREEN; i++)
@@ -50,9 +74,12 @@ void MenuBase::OnDraw() const
 			break;
 		}
 		auto const& item = m_items.at(itemIndex);
+		static const ColorRgba background{0, 0, 0, 80};
+		DrawUtils::DrawRect(lineLeft, lineTop - ROW_MARGIN, GetItemsWidth(), ROW_MARGIN, background);
 		item->OnDraw(lineTop, lineLeft, m_activeRowIndex == i);
 		lineTop += item->GetItemHeight() + ROW_MARGIN;
 	}
+	
 }
 
 int MenuBase::OnInput()

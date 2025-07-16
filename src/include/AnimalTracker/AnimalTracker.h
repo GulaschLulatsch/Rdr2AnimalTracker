@@ -1,10 +1,13 @@
 #pragma once
 
-#include "IniOptions.h"
 #include "AnimalInfo.h"
+#include "IniOptions.h"
+#include "MenuBase.h"
+#include "MenuController.h"
 
 #include <RDR2ScriptHook/types.h>
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -13,20 +16,23 @@ class AnimalTracker
 {
 public:
 	AnimalTracker();
-	void run();
+	void Run();
 
 private:
-	void update();
 
-	void updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips);
+	std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller);
 
-	static void removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash);
+	void Update();
+
+	void UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips);
+
+	static void RemoveOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash);
 
 	static std::string const iniFilePath;
 
-	IniOptions iniOptions;
-	std::unordered_map<Ped, Blip> blips{};
-	std::unordered_map<Hash, AnimalInfo> animalInfos;
+	IniOptions m_iniOptions;
+	std::unordered_map<Ped, Blip> m_blips{};
+	std::unordered_map<Hash, AnimalInfo> m_animalInfos;
 };
 
 

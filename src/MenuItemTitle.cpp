@@ -11,8 +11,6 @@ const ColorRgba MenuItemTitle::TEXT_COLOR{ 100, 0, 0, 255 };
 
 MenuItemTitle::MenuItemTitle(std::string const& caption) :
 	MenuItemBase{ 
-		ITEM_WIDTH, 
-		ITEM_HEIGHT, 
 		TEXT_LEFT_MARGIN, 
 		RECT_COLOR, 
 		TEXT_COLOR, 
