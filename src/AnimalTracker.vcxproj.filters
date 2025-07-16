@@ -37,9 +37,6 @@
     <ClCompile Include="MenuItemMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MenuItemFlush.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MenuItemAnimal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -100,9 +97,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AnimalTracker\MenuItemMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\AnimalTracker\MenuItemFlush.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AnimalTracker\MenuItemAnimal.h">

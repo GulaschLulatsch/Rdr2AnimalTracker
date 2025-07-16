@@ -6,8 +6,9 @@
 
 #include "SimpleIni\SimpleIni.h"
 
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 class IniOptions
 {
@@ -16,6 +17,7 @@ public:
 
 	std::unordered_map<Hash, AnimalInfo> GetAnimalMap() const;
 	void StoreAnimalMap(std::unordered_map<Hash, AnimalInfo> const& animalMap) const;
+	void StoreAnimalInfos(std::vector<const AnimalInfo*> infos) const;
 
 private:
 	static char const* const generalSectionName;

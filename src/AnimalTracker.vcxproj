@@ -28,7 +28,6 @@
     <ClCompile Include="MenuInput.cpp" />
     <ClCompile Include="MenuItemAnimal.cpp" />
     <ClCompile Include="MenuItemBase.cpp" />
-    <ClCompile Include="MenuItemFlush.cpp" />
     <ClCompile Include="MenuItemMenu.cpp" />
     <ClCompile Include="MenuItemDefault.cpp" />
     <ClCompile Include="MenuItemTitle.cpp" />
@@ -49,7 +48,6 @@
     <ClInclude Include="include\AnimalTracker\MenuInput.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemAnimal.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemBase.h" />
-    <ClInclude Include="include\AnimalTracker\MenuItemFlush.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemMenu.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemDefault.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemTitle.h" />

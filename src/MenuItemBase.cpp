@@ -10,23 +10,23 @@ void MenuItemBase::OnDraw(float lineTop, float lineLeft, bool active) const
 {
 	// text
 	ColorRgba color = active ? m_colorTextActive : m_colorText;
-	UI::SET_TEXT_SCALE(0.0, m_itemHeight * 8.0f);
+	UI::SET_TEXT_SCALE(0.0, GetItemHeight() * 8.0f);
 	UI::SET_TEXT_COLOR_RGBA(color.r, color.g, color.b, color.a);
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	DrawUtils::DrawText(lineLeft + m_textLeftMargin, lineTop + m_itemHeight / 4.5f, GetCaption());
+	DrawUtils::DrawText(lineLeft + m_textLeftMargin, lineTop + GetItemHeight() / 4.5f, GetCaption());
 	// rect
-	DrawUtils::DrawRect(lineLeft, lineTop, m_itemWidth, m_itemHeight, active ? m_colorRectActive : m_colorRect);
+	DrawUtils::DrawRect(lineLeft, lineTop, GetItemWidth(), GetItemHeight(), active ? m_colorRectActive : m_colorRect);
 }
 
 float MenuItemBase::GetItemWidth() const
 {
-	return m_itemWidth;
+	return m_menu->GetItemsWidth();
 }
 
 float MenuItemBase::GetItemHeight() const
 {
-	return m_itemHeight;
+	return m_menu->GetItemsHeight();
 }
 
 ColorRgba const& MenuItemBase::GetRectColor() const
@@ -60,16 +60,12 @@ MenuBase* MenuItemBase::GetMenu() const
 }
 
 MenuItemBase::MenuItemBase(
-	float itemWidth,
-	float itemHeight,
 	float textLeftMargin,
 	ColorRgba colorRect,
 	ColorRgba colorText,
 	ColorRgba colorRectActive,
 	ColorRgba colorTextActive
 ) :
-	m_itemWidth{ itemWidth },
-	m_itemHeight{ itemHeight },
 	m_textLeftMargin { textLeftMargin },
 	m_colorRect{colorRect}, 
 	m_colorText{colorText},

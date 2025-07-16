@@ -27,11 +27,11 @@ DWORD	pedUpdateTime;
 std::string const AnimalTracker::iniFilePath{ "AnimalTracker/AnimalTracker.ini" };
 
 AnimalTracker::AnimalTracker() :
-	iniOptions{ iniFilePath },
-	animalInfos{ iniOptions.GetAnimalMap() }
+	m_iniOptions{ iniFilePath },
+	m_animalInfos{ m_iniOptions.GetAnimalMap() }
 {}
 
-void AnimalTracker::removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash) {
+void AnimalTracker::RemoveOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash) {
 	if (showQuality) {
 		MAP::BLIP_ADD_MODIFIER(animalBlip, hash);
 	}else{
@@ -39,7 +39,7 @@ void AnimalTracker::removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash h
 	}
 }
 
-void AnimalTracker::update()
+void AnimalTracker::Update()
 {
 
 	Player player = PLAYER::PLAYER_ID();
@@ -59,20 +59,20 @@ void AnimalTracker::update()
 	std::unordered_set<Blip> currentBlips;
 	for (Ped ped: peds)
 	{
-		updateBlipForPed(ped, currentBlips);
+		UpdateBlipForPed(ped, currentBlips);
 	}
 
 
-	for (auto& pair : blips) {
+	for (auto& pair : m_blips) {
 		auto currentIterator = currentBlips.find(pair.first);
 		if (currentIterator == currentBlips.end()) {
 			MAP::REMOVE_BLIP(&pair.second);
-			blips.erase(pair.first);
+			m_blips.erase(pair.first);
 		}
 	}
 }
 
-void AnimalTracker::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips)
+void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips)
 {
 	if (PED::IS_PED_HUMAN(ped))
 		return;
@@ -83,8 +83,8 @@ void AnimalTracker::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	if (animalType == unknownAnimalTypeMagicValue) { // what the fuck is this magic value??
 		return;
 	}
-	auto animalInfoIterator{ animalInfos.find(animalType) };
-	if (animalInfoIterator == animalInfos.end()) {
+	auto animalInfoIterator{ m_animalInfos.find(animalType) };
+	if (animalInfoIterator == m_animalInfos.end()) {
 		return;
 	}
 
@@ -94,8 +94,8 @@ void AnimalTracker::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	ePedQuality quality = static_cast<ePedQuality>(PED::_GET_PED_QUALITY(ped));
 	bool qualityMatches = animalInfo.QualityMatches(quality);
 
-	auto iterator = blips.find(ped);
-	if (iterator != blips.end()) { // Blip already exists for Ped
+	auto iterator = m_blips.find(ped);
+	if (iterator != m_blips.end()) { // Blip already exists for Ped
 		if(!qualityMatches || ENTITY::IS_ENTITY_DEAD(ped)) { // Remove Blip (This happens when animal quality changes between tick, ie. after being shot)
 			MAP::REMOVE_BLIP(&iterator->second);
 		}
@@ -111,7 +111,7 @@ void AnimalTracker::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	}
 	static const Hash unknownBlipHash{ 0x63351D54 };
 	Blip animalBlip = MAP::BLIP_ADD_FOR_ENTITY(unknownBlipHash, ped);
-	blips.insert({ ped, animalBlip });
+	m_blips.insert({ ped, animalBlip });
 	currentBlips.insert(ped);
 
 
@@ -141,14 +141,14 @@ void AnimalTracker::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	MAP::_SET_BLIP_NAME(animalBlip, animalInfo.GetName().c_str());
 }
 
-static std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, std::unordered_map<Hash, AnimalInfo>& animalInfos)
+std::unique_ptr<MenuBase> AnimalTracker::CreateMainMenu(MenuController& controller)
 {
 	auto menu = std::make_unique<MenuBase>(std::make_unique<MenuItemTitle>("ANIMAL TRACKER"));
 	controller.RegisterMenu(menu.get());
 
 	std::vector<std::pair<const Hash, AnimalInfo>*> sortedNames; // use vector of pointers to avoid unnecesssary copy
-	sortedNames.reserve(animalInfos.size());
-	for (auto& entry : animalInfos) {
+	sortedNames.reserve(m_animalInfos.size());
+	for (auto& entry : m_animalInfos) {
 		sortedNames.push_back(&entry); // not sorted yet
 	}
 
@@ -158,16 +158,21 @@ static std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, std:
 
 	for (auto& animal : sortedNames) {
 		AnimalInfo& animalInfo = animal->second;
-		menu->AddItem(std::make_unique<MenuItemAnimal>(animalInfo));
+		menu->AddItem(std::make_unique<MenuItemAnimal>(
+			animalInfo, 
+			[&ini = m_iniOptions](const AnimalInfo& info) { 
+				ini.StoreAnimalInfos(std::vector<const AnimalInfo*>{ &info }); 
+			}
+		));
 	}
 
 	return menu;
 }
 
-void AnimalTracker::run()
+void AnimalTracker::Run()
 {
 	MenuController menuController{};
-	auto mainMenu = CreateMainMenu(menuController, animalInfos);
+	auto mainMenu = CreateMainMenu(menuController);
 
 	while (true)
 	{
@@ -177,7 +182,7 @@ void AnimalTracker::run()
 		}
 		menuController.Update();
 
-		update();
+		Update();
 		WAIT(0);
 	}
 }
@@ -186,7 +191,7 @@ void ScriptMain()
 {
 	AnimalTracker animalTracker;
 	try {
-		animalTracker.run();
+		animalTracker.Run();
 	}
 	catch (...) {
 

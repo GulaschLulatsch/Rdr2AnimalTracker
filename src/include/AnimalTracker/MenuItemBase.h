@@ -28,8 +28,6 @@ public:
 
 protected:
 	MenuItemBase(
-		float itemWidth,
-		float itemHeight,
 		float textLeftMargin,
 		ColorRgba colorRect,
 		ColorRgba colorText,
@@ -42,9 +40,6 @@ protected:
 
 private:
 
-
-	float		m_itemWidth;
-	float		m_itemHeight;
 	float		m_textLeftMargin;
 	ColorRgba	m_colorRect;
 	ColorRgba	m_colorText;

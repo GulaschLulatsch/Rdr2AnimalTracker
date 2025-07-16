@@ -7,14 +7,22 @@
 #include <RDR2ScriptHook/natives.h>
 
 MenuItemAnimal::MenuItemAnimal(
-	AnimalInfo& animalInfo
+	AnimalInfo& animalInfo,
+	std::function<void(AnimalInfo const&)> saveFunction
 ) :
 	MenuItemDefault{ animalInfo.GetName()},
-	m_animalInfo{ animalInfo }
+	m_animalInfo{ animalInfo },
+	m_saveFunction{ std::move(saveFunction) }
 {}
+
+const AnimalInfo& MenuItemAnimal::GetAnimalInfo() const
+{
+	return m_animalInfo;
+}
 
 void MenuItemAnimal::OnSelect() {
 	m_animalInfo.RotateQuality();
+	m_saveFunction(m_animalInfo);
 }
 
 EMenuItemType MenuItemAnimal::GetClass() const
