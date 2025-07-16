@@ -1,10 +1,9 @@
 #include "RDR2ScriptHook\main.h"
 
-#include "AnimalFinder.h"
+#include "AnimalTracker.h"
 #include "Keyboard.h"
 
-#include <minwindef.h>
-#include <winnt.h>
+#include <Windows.h>
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {

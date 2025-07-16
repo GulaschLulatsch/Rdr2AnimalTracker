@@ -9,14 +9,16 @@ public:
 	QualityFilter(bool poor, bool good, bool perfect);
 
 	bool Matches(ePedQuality quality) const;
+
+	int GetBitMask() const;
 	
 	void Rotate();
 
-private:
+	static constexpr const int POOR{ 0b001 };
+	static constexpr const int GOOD{ 0b010 };
+	static constexpr const int PERFECT{ 0b100 };
 
-	static constexpr const int POOR		{ 0b001 };
-	static constexpr const int GOOD		{ 0b010 };
-	static constexpr const int PERFECT	{ 0b100 };
+private:
 
 	int m_filter;
 };

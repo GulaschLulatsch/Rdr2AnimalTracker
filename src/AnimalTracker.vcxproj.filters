@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="AnimalFinder.cpp">
+    <ClCompile Include="AnimalTracker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ColorRgba.cpp">
@@ -57,7 +57,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\AnimalTracker\AnimalFinder.h">
+    <ClInclude Include="include\AnimalTracker\AnimalTracker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AnimalTracker\ColorRgba.h">

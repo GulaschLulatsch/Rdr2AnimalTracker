@@ -22,7 +22,7 @@
     <ClCompile Include="IniOptions.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="AnimalFinder.cpp" />
+    <ClCompile Include="AnimalTracker.cpp" />
     <ClCompile Include="MenuBase.cpp" />
     <ClCompile Include="MenuController.cpp" />
     <ClCompile Include="MenuInput.cpp" />
@@ -54,7 +54,7 @@
     <ClInclude Include="include\AnimalTracker\MenuItemDefault.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemTitle.h" />
     <ClInclude Include="include\AnimalTracker\NamesInfo.h" />
-    <ClInclude Include="include\AnimalTracker\AnimalFinder.h" />
+    <ClInclude Include="include\AnimalTracker\AnimalTracker.h" />
     <ClInclude Include="include\AnimalTracker\QualityFilter.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

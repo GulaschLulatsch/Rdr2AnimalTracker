@@ -2,11 +2,11 @@
 
 #include "QualityFilter.h"
 
-#include <RDR2ScriptHook/types.h>
 #include <RDR2ScriptHook/enums.h>
+#include <RDR2ScriptHook/types.h>
 
 #include <string>
-#include <type_traits>
+#include <utility>
 
 AnimalInfo::AnimalInfo(Hash hash, std::string const& name, bool isFish, QualityFilter filter) :
 	m_hash{ hash },
@@ -23,6 +23,11 @@ Hash AnimalInfo::GetHash() const
 const std::string& AnimalInfo::GetName() const
 {
 	return m_name;
+}
+
+int AnimalInfo::GetQualityBitmask() const
+{
+	return m_filter.GetBitMask();
 }
 
 bool AnimalInfo::IsFish() const

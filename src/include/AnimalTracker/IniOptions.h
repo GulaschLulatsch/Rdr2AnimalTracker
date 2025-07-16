@@ -14,20 +14,18 @@ class IniOptions
 public:
 	IniOptions( std::string const& generalInifile);
 
-	std::unordered_map<Hash, AnimalInfo> getAnimalNames() const;
-	bool getShowBirds() const;
-	bool getShowExcellentQuality() const;
-	bool getShowMediumQuality() const;
-	bool getShowPoorQuality() const;
+	std::unordered_map<Hash, AnimalInfo> GetAnimalMap() const;
+	void StoreAnimalMap(std::unordered_map<Hash, AnimalInfo> const& animalMap) const;
 
 private:
-	static bool getBoolIniValue(const char* value);
+	static char const* const generalSectionName;
+	static char const* const languageSectionName;
+	static char const* const animalSectionName;
+	static char const* const categorySectionName;
 
-	static char const* const sectionName;
+	static std::string ExpandEnvironmentVariables(const std::string& input); 
 
-	CSimpleIniA generalIni{};
-	bool showBirds{ false };
-	bool showExcellentQuality{ false };
-	bool showMediumQuality{ false };
-	bool showPoorQuality{ false };
+	CSimpleIniA m_generalIni{};
+	std::string m_langFilePath{};
+	std::string m_stateFilePath{};
 };

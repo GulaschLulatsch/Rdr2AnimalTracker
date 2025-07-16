@@ -1,4 +1,4 @@
-﻿#include "AnimalFinder.h"
+﻿#include "AnimalTracker.h"
 
 #include "AnimalInfo.h"
 #include "MenuBase.h"
@@ -13,26 +13,25 @@
 #include <RDR2ScriptHook/types.h>
 
 #include <algorithm>
-#include <map>
 #include <memory>
-#include <minwindef.h>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <Windows.h>
 
 DWORD	vehUpdateTime;
 DWORD	pedUpdateTime;
 
-std::string const AnimalFinder::iniFilePath{ "AnimalsFinder/AnimalsFinder.ini" };
+std::string const AnimalTracker::iniFilePath{ "AnimalTracker/AnimalTracker.ini" };
 
-AnimalFinder::AnimalFinder() :
+AnimalTracker::AnimalTracker() :
 	iniOptions{ iniFilePath },
-	animalInfos{ iniOptions.getAnimalNames() }
+	animalInfos{ iniOptions.GetAnimalMap() }
 {}
 
-void AnimalFinder::removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash) {
+void AnimalTracker::removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash) {
 	if (showQuality) {
 		MAP::BLIP_ADD_MODIFIER(animalBlip, hash);
 	}else{
@@ -40,7 +39,7 @@ void AnimalFinder::removeOrModifyBlip(bool showQuality, Blip animalBlip, Hash ha
 	}
 }
 
-void AnimalFinder::update()
+void AnimalTracker::update()
 {
 
 	Player player = PLAYER::PLAYER_ID();
@@ -73,7 +72,7 @@ void AnimalFinder::update()
 	}
 }
 
-void AnimalFinder::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips)
+void AnimalTracker::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips)
 {
 	if (PED::IS_PED_HUMAN(ped))
 		return;
@@ -84,17 +83,14 @@ void AnimalFinder::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBl
 	if (animalType == unknownAnimalTypeMagicValue) { // what the fuck is this magic value??
 		return;
 	}
-
-	bool isBird{ static_cast<bool>(ENTITY::_GET_IS_BIRD(ped)) };
-	if (!iniOptions.getShowBirds() && isBird) {
+	auto animalInfoIterator{ animalInfos.find(animalType) };
+	if (animalInfoIterator == animalInfos.end()) {
 		return;
 	}
 
-	if (animalInfos.find(animalType) == animalInfos.end()) {
-		return;
-	}
+	AnimalInfo const& animalInfo{ animalInfoIterator->second };
 
-	AnimalInfo const& animalInfo{ animalInfos.at(animalType) };
+
 	ePedQuality quality = static_cast<ePedQuality>(PED::_GET_PED_QUALITY(ped));
 	bool qualityMatches = animalInfo.QualityMatches(quality);
 
@@ -132,33 +128,22 @@ void AnimalFinder::updateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBl
 		MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugYellow_solidYellow);
 	}
 
-	static const Hash animalTexture{ 0x9DE00913 };
-	static const Hash fishTexture{ 0xA216510E };
-	static const Hash smallDotTexture{ 0x000A9056 }; // TODO load custom bird texture
-	MAP::SET_BLIP_SPRITE(animalBlip, isBird ? smallDotTexture : animalInfo.IsFish() ? fishTexture : animalTexture, true);
-	MAP::SET_BLIP_SCALE(animalBlip, 0.8);
+	bool isBird{ static_cast<bool>(ENTITY::_GET_IS_BIRD(ped)) };
+
+	static const Hash animalTexture{ MISC::GET_HASH_KEY("blip_animal") };
+	//static const Hash fishTexture{ MISC::GET_HASH_KEY("blip_mg_fishing") };	// although theses textures would fit for fishing / birds, their black backgrounds make them not usable
+	//static const Hash smallDotTexture{ MISC::GET_HASH_KEY("blip_event_riggs_camp") }; 
+	MAP::SET_BLIP_SPRITE(animalBlip, animalTexture, true);
+	MAP::SET_BLIP_SCALE(animalBlip, isBird || animalInfo.IsFish() ? 0.5f : 0.8f); // Make Fish & birds smaller icons
+	MAP::SET_BLIP_ROTATION(animalBlip, animalInfo.IsFish() ? 180 : 0); // Not sure if i like this: for now draw fish icons upside down
 
 	//MAP::_SET_BLIP_NAME(animalBlip, HUD::GET_STRING_FROM_HASH_KEY(animalType));
 	MAP::_SET_BLIP_NAME(animalBlip, animalInfo.GetName().c_str());
 }
 
-bool AnimalFinder::qualityMatchesIni(int quality) const
+static std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, std::unordered_map<Hash, AnimalInfo>& animalInfos)
 {
-	if ((quality <= ePedQuality::PQ_LOW) && iniOptions.getShowPoorQuality()) {
-		return true;
-	}
-	if ((quality == ePedQuality::PQ_MEDIUM) && iniOptions.getShowMediumQuality()) {
-		return true;
-	}
-	if ((quality >= ePedQuality::PQ_HIGH) && iniOptions.getShowExcellentQuality()) {
-		return true;
-	}
-	return false;
-}
-
-std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, std::unordered_map<Hash, AnimalInfo>& animalInfos)
-{
-	auto menu = std::make_unique<MenuBase>(std::make_unique<MenuItemTitle>("ANIMALS FINDER"));
+	auto menu = std::make_unique<MenuBase>(std::make_unique<MenuItemTitle>("ANIMAL TRACKER"));
 	controller.RegisterMenu(menu.get());
 
 	std::vector<std::pair<const Hash, AnimalInfo>*> sortedNames; // use vector of pointers to avoid unnecesssary copy
@@ -179,7 +164,7 @@ std::unique_ptr<MenuBase> CreateMainMenu(MenuController& controller, std::unorde
 	return menu;
 }
 
-void AnimalFinder::run()
+void AnimalTracker::run()
 {
 	MenuController menuController{};
 	auto mainMenu = CreateMainMenu(menuController, animalInfos);
@@ -199,9 +184,9 @@ void AnimalFinder::run()
 
 void ScriptMain()
 {
-	AnimalFinder animalFinder;
+	AnimalTracker animalTracker;
 	try {
-		animalFinder.run();
+		animalTracker.run();
 	}
 	catch (...) {
 
