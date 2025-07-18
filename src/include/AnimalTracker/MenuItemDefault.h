@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ColorRgba.h"
-#include "EMenuItemType.h"
 #include "MenuItemBase.h"
+#include "IInfo.h"
 
 #include <string>
 
@@ -12,6 +12,8 @@ public:
 	std::string GetCaption() const override; 
 protected:
 	MenuItemDefault(std::string const& caption);
+
+	void DrawQuality(const IInfo& info, float lineTop, float lineLeft) const;
 private:
 
 	static const float ITEM_WIDTH;

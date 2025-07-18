@@ -1,31 +1,29 @@
 #include "MenuItemMenu.h"
 
 #include "ColorRgba.h"
-#include "MenuBase.h"
-#include "MenuItemDefault.h"
 #include "DrawUtils.h"
+#include "MenuBase.h"
 #include "MenuController.h"
+#include "MenuItemDefault.h"
+#include "IMenu.h"
+#include "MenuItemBase.h"
 
-#include "RDR2ScriptHook/natives.h"
+#include <RDR2ScriptHook/natives.h>
 
 #include <memory>
 #include <string>
-#include <type_traits>
+#include <utility>
 
-MenuItemMenu::MenuItemMenu(std::string const& caption, std::unique_ptr<MenuBase> menu) :
+MenuItemMenu::MenuItemMenu(std::string const& caption, std::unique_ptr<IMenu> menu) :
 	MenuItemDefault{ caption },
 	m_menu{ std::move(menu) }
 {}
 
 
-void MenuItemMenu::OnRight()
+void MenuItemMenu::OnRight(MenuController* controller)
 {
-	MenuBase* parentMenu = GetMenu();
-	if (parentMenu) {
-		MenuController* controller = parentMenu->GetController();
-		if (controller) {
-			controller->PushMenu(m_menu.get());
-		}
+	if (controller) {
+		controller->PushMenu(m_menu.get());
 	}
 }
 
@@ -34,13 +32,12 @@ void MenuItemMenu::OnDraw(float lineTop, float lineLeft, bool active) const
 {
 	MenuItemBase::OnDraw(lineTop, lineLeft, active);
 
-	ColorRgba textColor = active ? GetActiveTextColor() : GetTextColor();
-	float width{ GetItemWidth() };
-	float height{ GetItemHeight()};
-
-	UI::SET_TEXT_SCALE(0.0, height * 8.0f);
-	UI::SET_TEXT_COLOR_RGBA(textColor.r, textColor.g, textColor.b, textColor.a / 2);
+	ColorRgba color = active ? GetActiveTextColor() : GetTextColor();
+	UI::SET_TEXT_SCALE(0.0, GetItemHeight() * 8.0f);
+	UI::SET_TEXT_COLOR_RGBA(color.r, color.g, color.b, color.a);
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	DrawUtils::DrawText(lineLeft + width - width / 8, lineTop + height / 3.5f, ">");
+	DrawUtils::DrawText(lineLeft + GetItemWidth() - GetItemWidth() / 10, lineTop + GetItemHeight() / 4.5f, ">");
+
+	m_menu->SetPosition(lineLeft + GetItemWidth() + MenuBase::ROW_MARGIN, lineTop);
 }

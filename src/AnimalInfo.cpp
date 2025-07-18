@@ -7,6 +7,7 @@
 
 #include <string>
 #include <utility>
+#include "CategoryInfo.h"
 
 AnimalInfo::AnimalInfo(Hash hash, std::string const& name, bool isFish, QualityFilter filter) :
 	m_hash{ hash },
@@ -43,4 +44,22 @@ bool AnimalInfo::QualityMatches(ePedQuality quality) const
 void AnimalInfo::RotateQuality()
 {
 	m_filter.Rotate();
+	if (m_parentCategory) {
+		m_parentCategory->UnsetQuality();
+	}
+}
+
+void AnimalInfo::SetContainingCategory(CategoryInfo* category)
+{
+	m_parentCategory = category;
+}
+
+void AnimalInfo::SetQuality(const QualityFilter& quality)
+{
+	m_filter = quality;
+}
+
+bool AnimalInfo::IsQualitySet() const
+{
+	return m_filter.IsSet();
 }

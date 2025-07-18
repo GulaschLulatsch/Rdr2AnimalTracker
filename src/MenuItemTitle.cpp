@@ -4,6 +4,7 @@
 #include "EMenuItemType.h"
 #include "MenuItemBase.h"
 
+#include "IMenu.h"
 #include <string>
 
 const ColorRgba MenuItemTitle::RECT_COLOR{ 0, 0, 0, 255 };
@@ -33,5 +34,5 @@ std::string MenuItemTitle::GetCaption() const
 void MenuItemTitle::OnSelect()
 { /*Title should be unable to get selected*/ }
 
-void MenuItemTitle::OnRight()
+void MenuItemTitle::OnRight(MenuController*)
 { /*Title should be unable to get selected*/ }

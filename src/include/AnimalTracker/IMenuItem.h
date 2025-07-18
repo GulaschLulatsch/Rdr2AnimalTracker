@@ -1,11 +1,13 @@
 #pragma once
 
-#include "EMenuItemType.h"
 #include "ColorRgba.h"
+#include "EMenuItemType.h"
+#include "IMenu.h"
 
 #include <string>
 
 class MenuBase;
+class MenuController;
 
 class IMenuItem {
 public:
@@ -15,7 +17,7 @@ public:
 
 	virtual void OnDraw(float lineTop, float lineLeft, bool active) const = 0;
 	virtual	void OnSelect() = 0;
-	virtual	void OnRight() = 0;
+	virtual	void OnRight(MenuController* controller) = 0;
 
 	virtual	std::string GetCaption() const = 0;
 
@@ -28,6 +30,6 @@ public:
 	virtual ColorRgba const& GetActiveRectColor() const = 0;
 	virtual ColorRgba const& GetActiveTextColor() const = 0;
 
-	virtual void SetMenu(MenuBase* menu) = 0;
-	virtual MenuBase* GetMenu() const = 0;
+	virtual void SetMenu(IMenu* menu) = 0;
+	virtual IMenu* GetMenu() const = 0;
 };

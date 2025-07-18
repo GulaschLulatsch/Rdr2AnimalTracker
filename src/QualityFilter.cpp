@@ -3,19 +3,23 @@
 #include <RDR2ScriptHook/enums.h>
 
 QualityFilter::QualityFilter(int filter) :
-	m_filter{ filter & (POOR | GOOD | PERFECT) }
+	m_filter{ ((filter & NOT_SET) > 0) ? NOT_SET : (filter & (POOR | GOOD | PERFECT )) }
 {}
 
-QualityFilter::QualityFilter(bool poor, bool good, bool perfect) :
-	m_filter{ 
-		(poor ? POOR : 0) |
-		(good ? GOOD : 0) |
-		(perfect ? PERFECT : 0)
-	}
+QualityFilter::QualityFilter(const QualityFilter & other):
+	m_filter{ other.m_filter }
 {}
+
+bool QualityFilter::IsSet() const
+{
+	return (m_filter & NOT_SET) == 0;
+}
 
 bool QualityFilter::Matches(ePedQuality quality) const
 {
+	if (!IsSet()) {
+		return false;
+	}
 	if (quality < PQ_MEDIUM) {
 		return (m_filter & POOR) > 0;
 	}
@@ -30,8 +34,13 @@ int QualityFilter::GetBitMask() const
 	return m_filter;
 }
 
+void QualityFilter::Unset()
+{
+	m_filter = NOT_SET;
+}
+
 void QualityFilter::Rotate(){
-	if (m_filter == (POOR | GOOD | PERFECT)) {
+	if (m_filter == (POOR | GOOD | PERFECT) || !IsSet()) {
 		m_filter = 0;
 	}
 	else {

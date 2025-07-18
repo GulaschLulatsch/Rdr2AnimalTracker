@@ -6,6 +6,8 @@
 
 #include <string>
 
+class MenuController;
+
 class MenuItemTitle : public MenuItemBase
 {
 public:
@@ -15,7 +17,7 @@ public:
 	std::string GetCaption() const override;
 
 	void OnSelect() override;
-	void OnRight() override;
+	void OnRight(MenuController* controller) override;
 
 private:
 	static constexpr const float TEXT_LEFT_MARGIN{ 0.08f };

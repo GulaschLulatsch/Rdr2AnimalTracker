@@ -1,11 +1,13 @@
 #pragma once
 
-#include "EMenuItemType.h"
-#include "MenuBase.h"
+#include "IMenu.h"
+
 #include "MenuItemDefault.h"
 
 #include <memory>
 #include <string>
+
+class MenuController;
 
 class MenuItemMenu : public MenuItemDefault
 {
@@ -14,10 +16,10 @@ public:
 
 	virtual void OnDraw(float lineTop, float lineLeft, bool active) const override;
 
-	void OnRight() override;
+	void OnRight(MenuController* controller) override;
 
 protected:
-	MenuItemMenu(std::string const& caption, std::unique_ptr<MenuBase> menu);
+	MenuItemMenu(std::string const& caption, std::unique_ptr<IMenu> menu);
 private:
-	std::unique_ptr<MenuBase> m_menu;
+	std::unique_ptr<IMenu> m_menu;
 };

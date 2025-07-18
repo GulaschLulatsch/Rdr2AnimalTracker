@@ -1,25 +1,27 @@
 #include "MenuController.h"
 
+#include "IMenu.h"
 #include "DrawUtils.h"
 
 #include <RDR2ScriptHook/natives.h>
+
+#include <string>
+#include <sysinfoapi.h>
 
 bool MenuController::HasActiveMenu() const
 {
 	 return !m_menuStack.empty();
 }
 
-void MenuController::PushMenu(MenuBase* menu)
+void MenuController::PushMenu(IMenu* menu)
 {
-	if (IsMenuRegistered(menu)) {
-		m_menuStack.push(menu);
-	}
+	m_menuStack.push_back(menu);
 }
 
 void MenuController::PopMenu()
 {
-	if (m_menuStack.size()) {
-		m_menuStack.pop();
+	if (!m_menuStack.empty()) {
+		m_menuStack.pop_back();
 	}
 }
 
@@ -27,16 +29,6 @@ void MenuController::SetStatusText(std::string const& text, int ms)
 {
 	m_statusText = text;
 	m_statusTextMaxTicks = GetTickCount64() + ms;
-}
-
-bool MenuController::IsMenuRegistered(MenuBase const* menu) const
-{
-	return menu->GetController() == this;
-}
-
-void MenuController::RegisterMenu(MenuBase* menu)
-{
-	menu->SetController(this);
 }
 
 void MenuController::Update()
@@ -50,17 +42,17 @@ void MenuController::InputWait(int ms)
 	m_inputTurnOnTime = GetTickCount64() + ms;
 }
 
-bool MenuController::InputIsOnWait()
+bool MenuController::InputIsOnWait() const
 {
 	return m_inputTurnOnTime > GetTickCount64();
 }
 
-MenuBase* MenuController::GetActiveMenu()
+IMenu* MenuController::GetActiveMenu()
 { 
-	return m_menuStack.empty() ? nullptr: m_menuStack.top();
+	return m_menuStack.empty() ? nullptr: m_menuStack.at(m_menuStack.size() - 1u);
 }
 
-void MenuController::DrawStatusText()
+void MenuController::DrawStatusText() const
 {
 	if (GetTickCount64() < m_statusTextMaxTicks)
 	{
@@ -74,7 +66,12 @@ void MenuController::DrawStatusText()
 
 void MenuController::OnDraw()
 {
-	if (MenuBase* menu = GetActiveMenu()){
+	static const float ORIGIN_X{ 0.f };
+	static const float ORIGIN_Y{ 0.05f };
+	if (!m_menuStack.empty()) {
+		m_menuStack.front()->SetPosition(ORIGIN_X, ORIGIN_Y);
+	}
+	for(IMenu* menu : m_menuStack){
 		menu->OnDraw();
 	}
 	DrawStatusText();
@@ -85,8 +82,8 @@ void MenuController::OnInput()
 	if (InputIsOnWait()){
 		return;
 	}
-	if (MenuBase* menu = GetActiveMenu()){
-		int waitTime = menu->OnInput();
+	if (IMenu* menu = GetActiveMenu()){
+		int waitTime = menu->OnInput(this);
 		if (waitTime > 0){
 			InputWait(waitTime);
 		}
