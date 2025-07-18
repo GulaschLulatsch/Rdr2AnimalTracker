@@ -1,10 +1,13 @@
 #include "MenuItemBase.h"
 
+#include "ColorRgba.h"
 #include "DrawUtils.h"
-#include "MenuBase.h"
-#include "MenuController.h"
+#include "IMenu.h"
 
-#include "RDR2ScriptHook/natives.h"
+#include <RDR2ScriptHook/main.h>
+#include <RDR2ScriptHook/natives.h>
+
+#include <sysinfoapi.h>
 
 void MenuItemBase::OnDraw(float lineTop, float lineLeft, bool active) const
 {
@@ -49,12 +52,12 @@ ColorRgba const& MenuItemBase::GetActiveTextColor() const
 	return m_colorTextActive;
 }
 
-void MenuItemBase::SetMenu(MenuBase* menu)
+void MenuItemBase::SetMenu(IMenu* menu)
 {
 	m_menu = menu;
 }
 
-MenuBase* MenuItemBase::GetMenu() const
+IMenu* MenuItemBase::GetMenu() const
 {
 	return m_menu;
 }
@@ -83,16 +86,6 @@ void MenuItemBase::WaitAndDraw(int ms)
 		waited = true;
 		if(m_menu){
 			m_menu->OnDraw();
-		}
-	}
-}
-
-void MenuItemBase::SetStatusText(std::string const& text, int ms)
-{
-	if(m_menu){
-		MenuController* controller{ m_menu->GetController() };
-		if (controller){
-			controller->SetStatusText(text, ms);
 		}
 	}
 }

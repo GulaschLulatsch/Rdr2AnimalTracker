@@ -1,13 +1,11 @@
 #pragma once
 
-#include "MenuBase.h"
+#include "IMenu.h"
 
 #include "windows.h"
-#include "sysinfoapi.h"
 
 #include <string>
 #include <vector>
-#include <stack>
 
 class MenuController
 {
@@ -15,16 +13,14 @@ public:
 	MenuController() = default;
 
 	bool HasActiveMenu() const;
-	void PushMenu(MenuBase* menu); 
+	void PushMenu(IMenu* menu);
 	void PopMenu();
 	void SetStatusText(std::string const& text, int ms);
-	bool IsMenuRegistered(MenuBase const* menu) const;
-	void RegisterMenu(MenuBase* menu);
 	
 	void Update();
 
 private:
-	std::stack<MenuBase*> m_menuStack{};
+	std::vector<IMenu*> m_menuStack{};
 
 	ULONGLONG	m_inputTurnOnTime{ 0 };
 
@@ -32,9 +28,9 @@ private:
 	ULONGLONG	m_statusTextMaxTicks{ 0 };
 
 	void InputWait(int ms);
-	bool InputIsOnWait();
-	MenuBase* GetActiveMenu();
-	void DrawStatusText();
+	bool InputIsOnWait() const;
+	IMenu* GetActiveMenu();
+	void DrawStatusText() const;
 	void OnDraw();
 	void OnInput();
 };

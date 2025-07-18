@@ -7,6 +7,8 @@
 
 #include <functional>
 
+class MenuController;
+
 class MenuItemAnimal : public MenuItemDefault
 {
 public:
@@ -20,7 +22,7 @@ public:
 	EMenuItemType GetClass() const override;
 	void OnDraw(float lineTop, float lineLeft, bool active) const override;
 	void OnSelect() override;
-	void OnRight() override;
+	void OnRight(MenuController* controller) override;
 
 private:
 	AnimalInfo& m_animalInfo;

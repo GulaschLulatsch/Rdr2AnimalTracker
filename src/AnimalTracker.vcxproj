@@ -17,6 +17,9 @@
   <ItemGroup>
     <ClCompile Include="..\external\SimpleIni\src\ConvertUTF.c" />
     <ClCompile Include="AnimalInfo.cpp" />
+    <ClCompile Include="AnimalMenu.cpp" />
+    <ClCompile Include="CategoryInfo.cpp" />
+    <ClCompile Include="CategoryMenu.cpp" />
     <ClCompile Include="ColorRgba.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="IniOptions.cpp" />
@@ -28,6 +31,7 @@
     <ClCompile Include="MenuInput.cpp" />
     <ClCompile Include="MenuItemAnimal.cpp" />
     <ClCompile Include="MenuItemBase.cpp" />
+    <ClCompile Include="MenuItemCategory.cpp" />
     <ClCompile Include="MenuItemMenu.cpp" />
     <ClCompile Include="MenuItemDefault.cpp" />
     <ClCompile Include="MenuItemTitle.cpp" />
@@ -37,9 +41,14 @@
     <ClInclude Include="..\external\SimpleIni\include\SimpleIni\ConvertUTF.h" />
     <ClInclude Include="..\external\SimpleIni\include\SimpleIni\SimpleIni.h" />
     <ClInclude Include="include\AnimalTracker\AnimalInfo.h" />
+    <ClInclude Include="include\AnimalTracker\AnimalMenu.h" />
+    <ClInclude Include="include\AnimalTracker\CategoryInfo.h" />
+    <ClInclude Include="include\AnimalTracker\CategoryMenu.h" />
     <ClInclude Include="include\AnimalTracker\ColorRgba.h" />
     <ClInclude Include="include\AnimalTracker\DrawUtils.h" />
     <ClInclude Include="include\AnimalTracker\EMenuItemType.h" />
+    <ClInclude Include="include\AnimalTracker\IInfo.h" />
+    <ClInclude Include="include\AnimalTracker\IMenu.h" />
     <ClInclude Include="include\AnimalTracker\IMenuItem.h" />
     <ClInclude Include="include\AnimalTracker\IniOptions.h" />
     <ClInclude Include="include\AnimalTracker\Keyboard.h" />
@@ -48,6 +57,7 @@
     <ClInclude Include="include\AnimalTracker\MenuInput.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemAnimal.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemBase.h" />
+    <ClInclude Include="include\AnimalTracker\MenuItemCategory.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemMenu.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemDefault.h" />
     <ClInclude Include="include\AnimalTracker\MenuItemTitle.h" />

@@ -2,7 +2,7 @@
 
 #include "Keyboard.h"
 
-#include <WinUser.h>
+#include <Windows.h>
 
 bool MenuInput::MenuSwitchPressed()
 {

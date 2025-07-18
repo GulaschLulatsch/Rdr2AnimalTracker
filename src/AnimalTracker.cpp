@@ -1,11 +1,15 @@
 ﻿#include "AnimalTracker.h"
 
 #include "AnimalInfo.h"
-#include "MenuBase.h"
+#include "CategoryInfo.h"
+#include "CategoryMenu.h"
+#include "IMenu.h"
 #include "MenuController.h"
 #include "MenuInput.h"
 #include "MenuItemAnimal.h"
+#include "MenuItemCategory.h"
 #include "MenuItemTitle.h"
+#include "QualityFilter.h"
 
 #include <RDR2ScriptHook/enums.h>
 #include <RDR2ScriptHook/main.h>
@@ -15,7 +19,6 @@
 #include <algorithm>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -28,7 +31,9 @@ std::string const AnimalTracker::iniFilePath{ "AnimalTracker/AnimalTracker.ini" 
 
 AnimalTracker::AnimalTracker() :
 	m_iniOptions{ iniFilePath },
-	m_animalInfos{ m_iniOptions.GetAnimalMap() }
+	m_animalInfos{ m_iniOptions.GetAnimalMap() },
+	m_fishCategory{ "Fish", QualityFilter::NOT_SET },
+	m_otherCategory{ "Other", QualityFilter::NOT_SET }
 {}
 
 void AnimalTracker::RemoveOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash) {
@@ -141,10 +146,9 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	MAP::_SET_BLIP_NAME(animalBlip, animalInfo.GetName().c_str());
 }
 
-std::unique_ptr<MenuBase> AnimalTracker::CreateMainMenu(MenuController& controller)
+std::unique_ptr<IMenu> AnimalTracker::CreateMainMenu(MenuController& controller)
 {
-	auto menu = std::make_unique<MenuBase>(std::make_unique<MenuItemTitle>("ANIMAL TRACKER"));
-	controller.RegisterMenu(menu.get());
+	auto menu = std::make_unique<CategoryMenu>(std::make_unique<MenuItemTitle>("ANIMAL TRACKER"));
 
 	std::vector<std::pair<const Hash, AnimalInfo>*> sortedNames; // use vector of pointers to avoid unnecesssary copy
 	sortedNames.reserve(m_animalInfos.size());
@@ -156,15 +160,28 @@ std::unique_ptr<MenuBase> AnimalTracker::CreateMainMenu(MenuController& controll
 		return a->second.GetName() < b->second.GetName();
 	});
 
+	auto fishSubmenu{ std::make_unique<CategoryMenu>(nullptr) };
+	auto otherSubmenu{ std::make_unique<CategoryMenu>(nullptr) };
+
 	for (auto& animal : sortedNames) {
 		AnimalInfo& animalInfo = animal->second;
-		menu->AddItem(std::make_unique<MenuItemAnimal>(
-			animalInfo, 
-			[&ini = m_iniOptions](const AnimalInfo& info) { 
-				ini.StoreAnimalInfos(std::vector<const AnimalInfo*>{ &info }); 
+		bool isFish{ animalInfo.IsFish() };
+		auto animal{ std::make_unique<MenuItemAnimal>(
+			animalInfo,
+			[&ini = m_iniOptions](const AnimalInfo& info) {
+				ini.StoreAnimalInfos(std::vector<const AnimalInfo*>{ &info });
 			}
-		));
+		) };
+		if (isFish) {
+			m_fishCategory.AddAnimal(&animalInfo);
+			fishSubmenu->AddItem(std::move(animal));
+		}else {
+			m_otherCategory.AddAnimal(&animalInfo);
+			otherSubmenu->AddItem(std::move(animal));
+		}
 	}
+	menu->AddItem(std::make_unique<MenuItemCategory>(m_fishCategory, std::move(fishSubmenu), [](const CategoryInfo&){/* TODO Save to ini*/}));
+	menu->AddItem(std::make_unique<MenuItemCategory>(m_otherCategory, std::move(otherSubmenu), [](const CategoryInfo&) {/* TODO Save to ini*/}));
 
 	return menu;
 }

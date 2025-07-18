@@ -1,9 +1,8 @@
 #pragma once
 
 #include "ColorRgba.h"
+#include "IMenu.h"
 #include "IMenuItem.h"
-
-#include <string>
 
 class MenuBase;
 
@@ -23,8 +22,8 @@ public:
 	ColorRgba const& GetActiveRectColor() const override;
 	ColorRgba const& GetActiveTextColor() const override;
 
-	void SetMenu(MenuBase* menu) override;
-	MenuBase* GetMenu() const override;
+	void SetMenu(IMenu* menu) override;
+	IMenu* GetMenu() const override;
 
 protected:
 	MenuItemBase(
@@ -36,7 +35,6 @@ protected:
 	);
 
 	void WaitAndDraw(int ms);
-	void SetStatusText(std::string const& text, int ms = 2500);
 
 private:
 
@@ -46,5 +44,5 @@ private:
 	ColorRgba	m_colorRectActive;
 	ColorRgba	m_colorTextActive;
 
-	MenuBase* m_menu{ nullptr };
+	IMenu* m_menu{ nullptr };
 };
