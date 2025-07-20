@@ -38,19 +38,27 @@
     <ClCompile Include="QualityFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\external\better-enums\enum.h" />
+    <ClInclude Include="..\external\better-enums\enum_extended.h" />
     <ClInclude Include="..\external\SimpleIni\include\SimpleIni\ConvertUTF.h" />
     <ClInclude Include="..\external\SimpleIni\include\SimpleIni\SimpleIni.h" />
     <ClInclude Include="include\AnimalTracker\AnimalInfo.h" />
     <ClInclude Include="include\AnimalTracker\AnimalMenu.h" />
+    <ClInclude Include="include\AnimalTracker\Categories.h" />
     <ClInclude Include="include\AnimalTracker\CategoryInfo.h" />
     <ClInclude Include="include\AnimalTracker\CategoryMenu.h" />
     <ClInclude Include="include\AnimalTracker\ColorRgba.h" />
+    <ClInclude Include="include\AnimalTracker\CreateMap.h" />
     <ClInclude Include="include\AnimalTracker\DrawUtils.h" />
     <ClInclude Include="include\AnimalTracker\EMenuItemType.h" />
+    <ClInclude Include="include\AnimalTracker\IContainedInfo.h" />
+    <ClInclude Include="include\AnimalTracker\IContainingInfo.h" />
     <ClInclude Include="include\AnimalTracker\IInfo.h" />
+    <ClInclude Include="include\AnimalTracker\IInfoPersister.h" />
     <ClInclude Include="include\AnimalTracker\IMenu.h" />
     <ClInclude Include="include\AnimalTracker\IMenuItem.h" />
     <ClInclude Include="include\AnimalTracker\IniOptions.h" />
+    <ClInclude Include="include\AnimalTracker\ISandwichedInfo.h" />
     <ClInclude Include="include\AnimalTracker\Keyboard.h" />
     <ClInclude Include="include\AnimalTracker\MenuBase.h" />
     <ClInclude Include="include\AnimalTracker\MenuController.h" />
@@ -136,7 +144,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;Pools_EXPORTS;NOMINMAX;NODRAWTEXT;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>$(SolutionDir)\external\RDR2ScriptHook\include;$(SolutionDir)\src\include\AnimalTracker;$(SolutionDir)\external\SimpleIni\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\external\better-enums;$(SolutionDir)\external\RDR2ScriptHook\include;$(SolutionDir)\src\include\AnimalTracker;$(SolutionDir)\external\SimpleIni\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,7 +169,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;Pools_EXPORTS;NOMINMAX;NODRAWTEXT;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>$(SolutionDir)\external\RDR2ScriptHook\include;$(SolutionDir)\src\include\AnimalTracker;$(SolutionDir)\external\SimpleIni\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\external\better-enums;$(SolutionDir)\external\RDR2ScriptHook\include;$(SolutionDir)\src\include\AnimalTracker;$(SolutionDir)\external\SimpleIni\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -186,7 +194,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;Pools_EXPORTS;NOMINMAX;NODRAWTEXT;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>$(SolutionDir)\external\RDR2ScriptHook\include;$(SolutionDir)\src\include\AnimalTracker;$(SolutionDir)\external\SimpleIni\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\external\better-enums;$(SolutionDir)\external\RDR2ScriptHook\include;$(SolutionDir)\src\include\AnimalTracker;$(SolutionDir)\external\SimpleIni\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

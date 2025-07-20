@@ -42,7 +42,7 @@ void MenuItemDefault::DrawQuality(const IInfo& info, float lineTop, float lineLe
 	if (!info.IsQualitySet() || info.QualityMatches(PQ_HIGH)) {
 		ColorRgba const& color = info.IsQualitySet() ? colorPerfect : colorDisabled;
 		GRAPHICS::DRAW_SPRITE(blipTextureDict, blipPerfectQuality,
-			lineLeft + GetItemWidth() - blipWidth, lineTop + GetItemHeight() - blipHeight,
+			lineLeft + GetItemWidth() - (2 * blipWidth), lineTop + GetItemHeight() - blipHeight,
 			blipWidth, blipHeight, 0.f,
 			color.r, color.g, color.b, color.a,
 			false/*??*/
@@ -51,7 +51,7 @@ void MenuItemDefault::DrawQuality(const IInfo& info, float lineTop, float lineLe
 	if (!info.IsQualitySet() || info.QualityMatches(PQ_MEDIUM)) {
 		ColorRgba const& color = info.IsQualitySet() ? colorGood : colorDisabled;
 		GRAPHICS::DRAW_SPRITE(blipTextureDict, blipGoodQuality,
-			lineLeft + GetItemWidth() - (2 * blipWidth), lineTop + GetItemHeight() - blipHeight,
+			lineLeft + GetItemWidth() - (3 * blipWidth), lineTop + GetItemHeight() - blipHeight,
 			blipWidth, blipHeight, 0.f,
 			color.r, color.g, color.b, color.a,
 			false/*??*/
@@ -60,7 +60,7 @@ void MenuItemDefault::DrawQuality(const IInfo& info, float lineTop, float lineLe
 	if (!info.IsQualitySet() || info.QualityMatches(PQ_LOW)) {
 		ColorRgba const& color = info.IsQualitySet() ? colorPoor : colorDisabled;
 		GRAPHICS::DRAW_SPRITE(blipTextureDict, blipPoorQuality,
-			lineLeft + GetItemWidth() - (3 * blipWidth), lineTop + GetItemHeight() - blipHeight,
+			lineLeft + GetItemWidth() - (4 * blipWidth), lineTop + GetItemHeight() - blipHeight,
 			blipWidth, blipHeight, 0.f,
 			color.r, color.g, color.b, color.a,
 			false/*??*/

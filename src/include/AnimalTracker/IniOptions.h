@@ -1,23 +1,21 @@
 #pragma once
 
-#include "RDR2ScriptHook\types.h"
-
-#include "AnimalInfo.h"
+#include "IContainingInfo.h"
+#include "IInfo.h"
+#include "IInfoPersister.h"
 
 #include "SimpleIni\SimpleIni.h"
 
+#include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-class IniOptions
-{
+class IniOptions : public IInfoPersister {
 public:
 	IniOptions( std::string const& generalInifile);
 
-	std::unordered_map<Hash, AnimalInfo> GetAnimalMap() const;
-	void StoreAnimalMap(std::unordered_map<Hash, AnimalInfo> const& animalMap) const;
-	void StoreAnimalInfos(std::vector<const AnimalInfo*> infos) const;
+	std::vector<std::unique_ptr<IContainingInfo>> LoadInfo() const;
+	void StoreInfos(std::vector<const IInfo*> infos) const override;
 
 private:
 	static char const* const generalSectionName;

@@ -12,10 +12,7 @@ class MenuController;
 class MenuItemAnimal : public MenuItemDefault
 {
 public:
-	MenuItemAnimal(
-		AnimalInfo& animalInfo,
-		std::function<void(AnimalInfo const&)> saveFunction
-	);
+	MenuItemAnimal(AnimalInfo& animalInfo);
 
 	const AnimalInfo& GetAnimalInfo() const;
 
@@ -26,5 +23,4 @@ public:
 
 private:
 	AnimalInfo& m_animalInfo;
-	std::function<void(AnimalInfo const&)> m_saveFunction;
 };

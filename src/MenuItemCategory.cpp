@@ -9,10 +9,9 @@
 #include <memory>
 #include <utility>
 
-MenuItemCategory::MenuItemCategory(CategoryInfo& categoryInfo, std::unique_ptr<IMenu> menu, std::function<void(CategoryInfo const&)> saveFunction) :
+MenuItemCategory::MenuItemCategory(CategoryInfo& categoryInfo, std::unique_ptr<IMenu> menu) :
 	MenuItemMenu{ categoryInfo.GetName(), std::move(menu) },
-	m_categoryInfo{ categoryInfo },
-	m_saveFunction{ std::move(saveFunction) }
+	m_categoryInfo{ categoryInfo }
 {}
 
 const CategoryInfo& MenuItemCategory::GetCategoryInfo() const
@@ -34,5 +33,4 @@ void MenuItemCategory::OnDraw(float lineTop, float lineLeft, bool active) const
 void MenuItemCategory::OnSelect()
 {
 	m_categoryInfo.RotateQuality();
-	m_saveFunction(m_categoryInfo);
 }

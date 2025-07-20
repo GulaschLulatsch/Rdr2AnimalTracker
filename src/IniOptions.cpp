@@ -3,13 +3,16 @@
 #include "AnimalInfo.h"
 #include "NamesInfo.h"
 #include "QualityFilter.h"
+#include "IInfo.h"
+#include "Categories.h"
+#include "CategoryInfo.h"
 
-#include "RDR2ScriptHook/types.h"
+#include <RDR2ScriptHook/types.h>
+#include <RDR2ScriptHook/enums.h>
 
 #include "SimpleIni/SimpleIni.h"
 
 #include <processenv.h>
-
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -32,74 +35,88 @@ IniOptions::IniOptions(std::string const & generalInifile)
 	m_stateFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "stateFilePath", "AnimalTracker/state.ini"));
 }
 
-std::unordered_map<Hash, AnimalInfo> IniOptions::GetAnimalMap() const
+std::vector<std::unique_ptr<IContainingInfo>> IniOptions::LoadInfo() const
 {
+	std::vector<std::unique_ptr<IContainingInfo>> returnVector{};
 
 	CSimpleIniA langIni;
-	if(langIni.LoadFile(m_langFilePath.c_str()) < 0) {
-		throw std::runtime_error{ std::string{ "Error! Failed to load the language file: " } + m_langFilePath};
+	if (langIni.LoadFile(m_langFilePath.c_str()) < 0) {
+		throw std::runtime_error{ std::string{ "Error! Failed to load the language file: " } + m_langFilePath };
 	};
-
-	// Get all keys in a section
-	CSimpleIniA::TNamesDepend keys;
-	langIni.GetAllKeys(languageSectionName, keys);
 
 	CSimpleIniA stateIni;
 	stateIni.LoadFile(m_stateFilePath.c_str()); // error is fine, just use defaults instead
 
-	std::unordered_map<Hash, AnimalInfo> m_animalInfos;
+	std::vector<const IInfo*> storeVector{}; // to write back result in the end
 
-	// Iterate through keys and get their values
-	for (const auto& key : keys) {
-		const char* value = langIni.GetValue(languageSectionName, key.pItem, "undefinded");
-
-		Hash animalHash = typetoHash.at(key.pItem);
-		QualityFilter qualityFilter{
-			static_cast<int>(stateIni.GetLongValue(
-				animalSectionName,
-				std::to_string(animalHash).c_str(),
-				static_cast<long>(QualityFilter::PERFECT)
-			))
-		};
-		long filterValue = qualityFilter.GetBitMask();
-		m_animalInfos.insert({ 
-			animalHash, 
-			AnimalInfo{
-				animalHash, 
-				value, 
-				fish.count(animalHash) > 0, 
-				std::move(qualityFilter)
-			} 
-		});
-	}
-	StoreAnimalMap(m_animalInfos);
-	return m_animalInfos;
-}
-
-void IniOptions::StoreAnimalMap(std::unordered_map<Hash, AnimalInfo> const& animalMap) const{
-	CSimpleIniA stateIni;
-	for (auto const& entry : animalMap) {
-		static_cast<void>(stateIni.SetLongValue(
-			animalSectionName,
-			std::to_string(entry.first).c_str(),
-			static_cast<long>(entry.second.GetQualityBitmask())
+	std::map<RootCategory, IContainingInfo*> tempRootMap;
+	for (RootCategory const& category : ROOT_CATEGORIES) {
+		std::string name{ langIni.GetValue(languageSectionName, category._to_string(), category._to_string()) };
+		returnVector.emplace_back(std::make_unique<CategoryInfo>(
+			category._to_string(), 
+			name,
+			stateIni.GetLongValue(
+				categorySectionName,
+				category._to_string(),
+				QualityFilter::NOT_SET
+			),
+			*this
 		));
-		// TODO log this somewhere (logfile?)
+		tempRootMap[category] = returnVector.back().get();
+		storeVector.push_back(returnVector.back().get());
 	}
-	stateIni.SaveFile(m_stateFilePath.c_str());
-	// TODO log this somewhere (logfile?)
+
+	std::map<SubCategory, IContainingInfo*> tempSubMap;
+	for (auto const& sub_root_pair : SUB_CATEGORIES) {
+		std::string name{ langIni.GetValue(languageSectionName, sub_root_pair.first._to_string(), sub_root_pair.first._to_string()) };
+		auto ptr{ std::make_unique<CategoryInfo>(
+			sub_root_pair.first._to_string(),
+			name,
+			stateIni.GetLongValue(
+				categorySectionName,
+				sub_root_pair.first._to_string(),
+				QualityFilter::NOT_SET
+			),
+			*this
+		)};
+		tempSubMap[sub_root_pair.first] = ptr.get();
+		storeVector.push_back(ptr.get());
+		tempRootMap.at(sub_root_pair.second)->AddContainedItem(std::move(ptr));
+	}
+
+
+	for (auto const& animal_sub_pair : ANIMALS) {
+		std::string name{ langIni.GetValue(languageSectionName, animal_sub_pair.first._to_string(), animal_sub_pair.first._to_string()) };
+		auto ptr{ std::make_unique<AnimalInfo>(
+			animal_sub_pair.first,
+			name,
+			(SUB_CATEGORIES.at(animal_sub_pair.second)._value == RootCategory::CA_FISH),  // TODO get this somehow
+			stateIni.GetLongValue(
+				animalSectionName,
+				std::to_string(animal_sub_pair.first._value).c_str(),
+				QualityFilter::PERFECT
+			),
+			*this
+		) };
+		storeVector.push_back(ptr.get());
+		tempSubMap.at(animal_sub_pair.second)->AddContainedItem(std::move(ptr));
+	}
+
+	StoreInfos(storeVector);
+	return returnVector;
 }
 
-void IniOptions::StoreAnimalInfos(std::vector<const AnimalInfo*> infos) const
+void IniOptions::StoreInfos(std::vector<const IInfo*> infos) const
 {
 	CSimpleIniA stateIni;
 	stateIni.LoadFile(m_stateFilePath.c_str()); // error is fine, just write instead
-	for(auto const& entry: infos)
-	static_cast<void>(stateIni.SetLongValue(
-		animalSectionName,
-		std::to_string(entry->GetHash()).c_str(),
-		static_cast<long>(entry->GetQualityBitmask())
-	));
+	for (auto const& entry : infos) {
+		stateIni.SetLongValue(
+			entry->GetClass() == InfoClass::AnimalInfo ? animalSectionName : categorySectionName,
+			entry->GetKey().c_str(),
+			static_cast<long>(entry->GetQualityBitmask())
+		);
+	}
 	stateIni.SaveFile(m_stateFilePath.c_str());
 }
 

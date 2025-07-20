@@ -15,8 +15,7 @@ class MenuItemCategory : public MenuItemMenu
 public:
 	MenuItemCategory(
 		CategoryInfo& categoryInfo,
-		std::unique_ptr<IMenu> menu,
-		std::function<void(CategoryInfo const&)> saveFunction
+		std::unique_ptr<IMenu> menu
 	);
 
 	const CategoryInfo& GetCategoryInfo() const;
@@ -27,5 +26,4 @@ public:
 
 private:
 	CategoryInfo& m_categoryInfo;
-	std::function<void(CategoryInfo const&)> m_saveFunction;
 };

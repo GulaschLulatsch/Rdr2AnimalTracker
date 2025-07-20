@@ -10,12 +10,10 @@
 #include <utility>
 
 MenuItemAnimal::MenuItemAnimal(
-	AnimalInfo& animalInfo,
-	std::function<void(AnimalInfo const&)> saveFunction
+	AnimalInfo& animalInfo
 ) :
 	MenuItemDefault{ animalInfo.GetName()},
-	m_animalInfo{ animalInfo },
-	m_saveFunction{ std::move(saveFunction) }
+	m_animalInfo{ animalInfo }
 {}
 
 const AnimalInfo& MenuItemAnimal::GetAnimalInfo() const
@@ -25,7 +23,6 @@ const AnimalInfo& MenuItemAnimal::GetAnimalInfo() const
 
 void MenuItemAnimal::OnSelect() {
 	m_animalInfo.RotateQuality();
-	m_saveFunction(m_animalInfo);
 }
 
 EMenuItemType MenuItemAnimal::GetClass() const

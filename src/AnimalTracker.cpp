@@ -31,10 +31,15 @@ std::string const AnimalTracker::iniFilePath{ "AnimalTracker/AnimalTracker.ini" 
 
 AnimalTracker::AnimalTracker() :
 	m_iniOptions{ iniFilePath },
-	m_animalInfos{ m_iniOptions.GetAnimalMap() },
-	m_fishCategory{ "Fish", QualityFilter::NOT_SET },
-	m_otherCategory{ "Other", QualityFilter::NOT_SET }
-{}
+	m_categories{ m_iniOptions.LoadInfo() }
+{
+	for (auto const& entry : m_categories) {
+		auto infos{ entry->GetAllAnimalInfos() };
+		for (auto const& info : infos) {
+			m_animalInfos[info->GetType()._value] = info;
+		}
+	}
+}
 
 void AnimalTracker::RemoveOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash) {
 	if (showQuality) {
@@ -93,7 +98,7 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 		return;
 	}
 
-	AnimalInfo const& animalInfo{ animalInfoIterator->second };
+	AnimalInfo const& animalInfo{ *animalInfoIterator->second };
 
 
 	ePedQuality quality = static_cast<ePedQuality>(PED::_GET_PED_QUALITY(ped));
@@ -146,7 +151,7 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	MAP::_SET_BLIP_NAME(animalBlip, animalInfo.GetName().c_str());
 }
 
-std::unique_ptr<IMenu> AnimalTracker::CreateMainMenu(MenuController& controller)
+std::unique_ptr<IMenu> AnimalTracker::CreateMenus(MenuController& controller)
 {
 	auto menu = std::make_unique<CategoryMenu>(std::make_unique<MenuItemTitle>("ANIMAL TRACKER"));
 

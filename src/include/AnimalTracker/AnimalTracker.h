@@ -21,7 +21,7 @@ public:
 
 private:
 
-	std::unique_ptr<IMenu> CreateMainMenu(MenuController& controller);
+	std::unique_ptr<IMenu> CreateMenus(MenuController& controller);
 
 	void Update();
 
@@ -33,11 +33,9 @@ private:
 
 	IniOptions m_iniOptions;
 	std::unordered_map<Ped, Blip> m_blips{};
-	std::unordered_map<Hash, AnimalInfo> m_animalInfos;
+	std::vector<std::unique_ptr<IContainingInfo>> m_categories;
+	std::unordered_map<Hash, AnimalInfo*> m_animalInfos{};
 
-	//TEMP for testing TODO remove
-	CategoryInfo m_fishCategory;
-	CategoryInfo m_otherCategory;
 };
 
 

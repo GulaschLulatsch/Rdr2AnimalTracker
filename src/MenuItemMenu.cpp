@@ -37,7 +37,7 @@ void MenuItemMenu::OnDraw(float lineTop, float lineLeft, bool active) const
 	UI::SET_TEXT_COLOR_RGBA(color.r, color.g, color.b, color.a);
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	DrawUtils::DrawText(lineLeft + GetItemWidth() - GetItemWidth() / 10, lineTop + GetItemHeight() / 4.5f, ">");
+	DrawUtils::DrawText(lineLeft + GetItemWidth() - (32.f/1920.f)/*Margin*/, lineTop + GetItemHeight() / 4.5f, ">");
 
 	m_menu->SetPosition(lineLeft + GetItemWidth() + MenuBase::ROW_MARGIN, lineTop);
 }

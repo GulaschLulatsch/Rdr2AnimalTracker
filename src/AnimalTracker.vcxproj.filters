@@ -144,6 +144,30 @@
     <ClInclude Include="include\AnimalTracker\IInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\AnimalTracker\IContainedInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimalTracker\IContainingInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimalTracker\ISandwichedInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimalTracker\IInfoPersister.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimalTracker\Categories.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\better-enums\enum.h">
+      <Filter>BetterEnums</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\better-enums\enum_extended.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimalTracker\CreateMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -156,6 +180,9 @@
     </Filter>
     <Filter Include="SimpleIni Files">
       <UniqueIdentifier>{f9ca9dbe-a71a-48b1-9d1a-29b0a71320f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BetterEnums">
+      <UniqueIdentifier>{b6721f60-106a-4763-9b32-72cd3baabd9b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

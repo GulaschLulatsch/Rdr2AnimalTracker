@@ -1,34 +1,57 @@
 #pragma once
 
-#include "IInfo.h"
+#include "ISandwichedInfo.h"
 #include "QualityFilter.h"
+#include "IContainedInfo.h"
+#include "IContainingInfo.h"
+#include "IInfo.h"
+#include "IInfoPersister.h"
 
 #include <RDR2ScriptHook/enums.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
 class AnimalInfo;
 
-class CategoryInfo : public IInfo{
+class CategoryInfo : public ISandwichedInfo {
 public:
 	CategoryInfo(
+		std::string const& key,
 		std::string const& name,
-		QualityFilter filter 
+		QualityFilter filter,
+		IInfoPersister const& saveFile
 	);
 
-	void AddAnimal(AnimalInfo* animal);
-
+	InfoClass GetClass() const override;
+	const std::string& GetKey() const override;
 	const std::string& GetName() const override;
 	int GetQualityBitmask() const override;
+
 	bool IsQualitySet() const override;
 	bool QualityMatches(ePedQuality quality) const override;
 
+	void AddContainedItem(std::unique_ptr<IContainedInfo> child) override;
+	void SetContainingItem(IContainingInfo& parent, ContainingInfoAccess const&) override;
+	std::vector<AnimalInfo*> GetAllAnimalInfos() override;
+
+	void SetQuality(const QualityFilter& quality, std::vector<const IInfo*>& affectedInfos, ContainingInfoAccess const&) override;
+	void UnsetQuality(std::vector<const IInfo*>& affectedInfos, ContainedInfoAccess const&) override;
+
 	void RotateQuality() override;
-	void UnsetQuality();
 
 private:
+	IContainingInfo* m_parentItem{ nullptr };
+
+	const std::string m_key;
 	const std::string m_name;
+
 	QualityFilter m_filter;
-	std::vector<AnimalInfo*> m_animals;
+	IInfoPersister const& m_saveFile;
+
+	std::vector<std::unique_ptr<IContainedInfo>> m_children;
+
+	static const ContainedInfoAccess PARENT_ACCESS;
+	static const ContainingInfoAccess CHILD_ACCESS;
 };

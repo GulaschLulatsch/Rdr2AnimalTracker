@@ -1,5 +1,9 @@
 #include "AnimalInfo.h"
 
+#include "IContainedInfo.h"
+#include "IContainingInfo.h"
+#include "IInfo.h"
+#include "IInfoPersister.h"
 #include "QualityFilter.h"
 
 #include <RDR2ScriptHook/enums.h>
@@ -7,16 +11,20 @@
 
 #include <string>
 #include <utility>
-#include "CategoryInfo.h"
+#include <vector>
 
-AnimalInfo::AnimalInfo(Hash hash, std::string const& name, bool isFish, QualityFilter filter) :
+const ContainedInfoAccess AnimalInfo::ACCESS{};
+
+AnimalInfo::AnimalInfo(AnimalType hash, std::string const& name, bool isFish, QualityFilter filter, IInfoPersister const& saveFile) :
 	m_hash{ hash },
+	m_key{ std::to_string(hash._value) },
 	m_name{ name },
 	m_isFish{ isFish },
-	m_filter{ std::move(filter) }
+	m_filter{ std::move(filter) },
+	m_saveFile{ saveFile }
 {}
 
-Hash AnimalInfo::GetHash() const
+AnimalType AnimalInfo::GetType() const
 {
 	return m_hash;
 }
@@ -44,19 +52,33 @@ bool AnimalInfo::QualityMatches(ePedQuality quality) const
 void AnimalInfo::RotateQuality()
 {
 	m_filter.Rotate();
-	if (m_parentCategory) {
-		m_parentCategory->UnsetQuality();
+	std::vector<const IInfo*> affectedInfos{ this };
+
+	if (m_parentItem) {
+		m_parentItem->UnsetQuality(affectedInfos, ACCESS);
 	}
+	m_saveFile.StoreInfos(std::move(affectedInfos));
 }
 
-void AnimalInfo::SetContainingCategory(CategoryInfo* category)
+void AnimalInfo::SetContainingItem(IContainingInfo& parent, ContainingInfoAccess const&)
 {
-	m_parentCategory = category;
+	m_parentItem = &parent;
 }
 
-void AnimalInfo::SetQuality(const QualityFilter& quality)
+void AnimalInfo::SetQuality(const QualityFilter& quality, std::vector<const IInfo*>& affectedInfos, ContainingInfoAccess const&)
 {
 	m_filter = quality;
+	affectedInfos.push_back(this);
+}
+
+InfoClass AnimalInfo::GetClass() const
+{
+	return InfoClass::AnimalInfo;
+}
+
+const std::string& AnimalInfo::GetKey() const
+{
+	return m_key;
 }
 
 bool AnimalInfo::IsQualitySet() const
