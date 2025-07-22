@@ -1,17 +1,3 @@
-#pragma once
-
-class MenuController;
-
-class IMenu {
-public:
-	virtual ~IMenu() = default;
-
-	virtual size_t GetActiveItemIndex() const = 0;
-
-	virtual float GetItemsWidth() const = 0;
-	virtual float GetItemsHeight() const = 0;
-
-	virtual void SetPosition(float distanceFromLeft, float distanceFromTop) = 0;
-	virtual void OnDraw() const = 0;
-	virtual int OnInput(MenuController* controller) = 0;
-};
+version https://git-lfs.github.com/spec/v1
+oid sha256:17448749d09503b2b5685e4156a5f8cf4a9809d5f9f88b7a0426ae8aef15edba
+size 392

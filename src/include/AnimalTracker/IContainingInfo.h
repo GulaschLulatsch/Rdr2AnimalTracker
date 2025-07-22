@@ -1,25 +1,3 @@
-#pragma once
-
-#include "IInfo.h"
-#include "AnimalInfo.h"
-
-#include <vector>
-#include <memory>
-
-class IContainedInfo;
-class ContainedInfoAccess;
-
-class IContainingInfo : virtual public IInfo {
-public:
-	virtual ~IContainingInfo() = default;
-
-	virtual void AddContainedItem(std::unique_ptr<IContainedInfo> child) = 0;
-	virtual void UnsetQuality(std::vector<const IInfo*> & affectedInfos, ContainedInfoAccess const&) = 0;
-	virtual std::vector<AnimalInfo*> GetAllAnimalInfos() = 0;
-};
-
-class ContainingInfoAccess {
-	friend class IContainingInfo;
-private:
-	ContainingInfoAccess() = default;
-};
+version https://git-lfs.github.com/spec/v1
+oid sha256:2c4957827407ab13a1a0911ac3719ba48a2597ff5ebb4966c1a497102569b09a
+size 504

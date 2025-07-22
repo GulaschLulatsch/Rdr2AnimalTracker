@@ -1,36 +1,3 @@
-#include "MenuItemCategory.h"
-
-#include "CategoryInfo.h"
-#include "EMenuItemType.h"
-#include "IMenu.h"
-#include "MenuItemMenu.h"
-
-#include <functional>
-#include <memory>
-#include <utility>
-
-MenuItemCategory::MenuItemCategory(CategoryInfo& categoryInfo, std::unique_ptr<IMenu> menu) :
-	MenuItemMenu{ categoryInfo.GetName(), std::move(menu) },
-	m_categoryInfo{ categoryInfo }
-{}
-
-const CategoryInfo& MenuItemCategory::GetCategoryInfo() const
-{
-	return m_categoryInfo;
-}
-
-EMenuItemType MenuItemCategory::GetClass() const
-{
-	return EMenuItemType::Category;
-}
-
-void MenuItemCategory::OnDraw(float lineTop, float lineLeft, bool active) const
-{
-	MenuItemMenu::OnDraw(lineTop, lineLeft, active);
-	DrawQuality(m_categoryInfo, lineTop, lineLeft);
-}
-
-void MenuItemCategory::OnSelect()
-{
-	m_categoryInfo.RotateQuality();
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:84f2f9f97e9f6dfa38d1e37d37c6f2643c1f484fe94daddc69264f914cf71f91
+size 811

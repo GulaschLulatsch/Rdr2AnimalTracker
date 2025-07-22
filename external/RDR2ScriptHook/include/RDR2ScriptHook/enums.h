@@ -1,21 +1,3 @@
-#pragma once
-
-#include "types.h"
-
-enum eAnimalRarityLevel
-{
-	ARL_COMMON,
-	ARL_RARE,
-	ARL_LEGENDARY,
-	ARL_NUMRARITYLEVELS
-};
-
-enum ePedQuality
-{
-	PQ_INVALID = -1,
-	PQ_LOW,
-	PQ_MEDIUM,
-	PQ_HIGH,
-	PQ_MAX
-};
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:afdb48a130de26a6f256be9ead84214beef6fbfadbc0a413f64266947d6099ab
+size 205

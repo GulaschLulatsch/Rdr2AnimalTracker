@@ -1,18 +1,3 @@
-#pragma once
-
-struct ColorRgba{
-	ColorRgba();
-	ColorRgba( 
-		unsigned char red,
-		unsigned char green,
-		unsigned char blue,
-		unsigned char alpha = 255
-	);
-
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
-	unsigned char a;
-
-	ColorRgba adjustBrightness(double factor) const;
-};
+version https://git-lfs.github.com/spec/v1
+oid sha256:31c1fb854b2790c369b70287f339777e9e3e3171b7354ab1ef146b30adf75649
+size 284

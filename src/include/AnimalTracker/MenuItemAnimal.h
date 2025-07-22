@@ -1,26 +1,3 @@
-#pragma once
-
-#include "AnimalInfo.h"
-#include "MenuItemDefault.h"
-
-#include "EMenuItemType.h"
-
-#include <functional>
-
-class MenuController;
-
-class MenuItemAnimal : public MenuItemDefault
-{
-public:
-	MenuItemAnimal(AnimalInfo& animalInfo);
-
-	const AnimalInfo& GetAnimalInfo() const;
-
-	EMenuItemType GetClass() const override;
-	void OnDraw(float lineTop, float lineLeft, bool active) const override;
-	void OnSelect() override;
-	void OnRight(MenuController* controller) override;
-
-private:
-	AnimalInfo& m_animalInfo;
-};
+version https://git-lfs.github.com/spec/v1
+oid sha256:d47f89f51893c9b422d4c535585a56022c78388190125a193d620d3f83bbef64
+size 493
