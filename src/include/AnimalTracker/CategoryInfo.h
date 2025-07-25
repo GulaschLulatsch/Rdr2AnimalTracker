@@ -1,3 +1,60 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:b7202cb997b3bb71a113903a4aee0eeda90d1d444b8aad91e0ee639745ec8ac5
-size 1619
+#pragma once
+
+#include "IContainedInfo.h"
+#include "IContainingInfo.h"
+#include "IInfo.h"
+#include "IInfoPersister.h"
+#include "IMenuItem.h"
+#include "ISandwichedInfo.h"
+#include "QualityFilter.h"
+
+#include <RDR2ScriptHook/enums.h>
+
+#include <memory>
+#include <string>
+#include <vector>
+
+class AnimalInfo;
+
+class CategoryInfo : public ISandwichedInfo {
+public:
+	CategoryInfo(
+		std::string const& key,
+		std::string const& name,
+		QualityFilter filter,
+		IInfoPersister const& saveFile
+	);
+
+	InfoClass GetClass() const override;
+	const std::string& GetKey() const override;
+	const std::string& GetName() const override;
+	int GetQualityBitmask() const override;
+
+	bool IsQualitySet() const override;
+	bool QualityMatches(ePedQuality quality) const override;
+
+	void AddContainedItem(std::unique_ptr<IContainedInfo> child) override;
+	void SetContainingItem(IContainingInfo& parent, ContainingInfoAccess const&) override;
+	std::vector<AnimalInfo*> GetAllAnimalInfos() override;
+
+	void SetQuality(const QualityFilter& quality, std::vector<const IInfo*>& affectedInfos, ContainingInfoAccess const&) override;
+	void UnsetQuality(std::vector<const IInfo*>& affectedInfos, ContainedInfoAccess const&) override;
+
+	void RotateQuality() override;
+
+	std::unique_ptr<IMenuItem> CreateMenuItem() override;
+
+private:
+	IContainingInfo* m_parentItem{ nullptr };
+
+	const std::string m_key;
+	const std::string m_name;
+
+	QualityFilter m_filter;
+	IInfoPersister const& m_saveFile;
+
+	std::vector<std::unique_ptr<IContainedInfo>> m_children;
+
+	static const ContainedInfoAccess PARENT_ACCESS;
+	static const ContainingInfoAccess CHILD_ACCESS;
+};

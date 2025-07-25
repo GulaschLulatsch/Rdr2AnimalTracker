@@ -1,3 +1,43 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:f971e4273a88ebab4355f4af03f1d7984653e3543627c1c3134939a0943bfb33
-size 819
+#pragma once
+
+#include "AnimalInfo.h"
+#include "IMenu.h"
+#include "IniOptions.h"
+#include "MenuController.h"
+#include "IInfo.h"
+
+#include <RDR2ScriptHook/types.h>
+
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+class AnimalTracker
+{
+public:
+	AnimalTracker();
+	void Run();
+
+private:
+
+	void Update();
+
+	void UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips);
+
+	static void RemoveOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash);
+
+	static std::string const iniFilePath;
+
+	MenuController m_menuController;
+	IniOptions m_iniOptions;
+	std::unordered_map<Ped, Blip> m_blips{};
+	std::vector<std::unique_ptr<IInfo>> m_categories;
+	std::unordered_map<Hash, AnimalInfo*> m_animalInfos;
+	std::unique_ptr<IMenu> m_mainMenu;
+
+};
+
+
+void ScriptMain();
