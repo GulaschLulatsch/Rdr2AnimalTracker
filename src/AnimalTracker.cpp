@@ -6,6 +6,7 @@
 #include "MenuController.h"
 #include "MenuInput.h"
 #include "MenuItemTitle.h"
+#include "StringComparator.h"
 
 #include <ScriptHookRDR2/enums.h>
 #include <ScriptHookRDR2/main.h>
@@ -53,9 +54,10 @@ AnimalTracker::AnimalTracker() :
 	}
 
 	//sort entries
+	StringComparator comp{ m_iniOptions.GetLocale() };
 	spdlog::debug("Sorting {} menu entries", menuEntries.size());
-	std::sort(menuEntries.begin(), menuEntries.end(), [](const std::unique_ptr<IMenuItem>& a, const std::unique_ptr<IMenuItem>& b) {
-		return a->GetCaption() < b->GetCaption();
+	std::sort(menuEntries.begin(), menuEntries.end(), [&comp](const std::unique_ptr<IMenuItem>& a, const std::unique_ptr<IMenuItem>& b) {
+		return comp(a->GetCaption(), b->GetCaption());
 	});
 
 	auto mainMenu{ std::make_unique<CategoryMenu>(std::make_unique<MenuItemTitle>("ANIMAL TRACKER")) };

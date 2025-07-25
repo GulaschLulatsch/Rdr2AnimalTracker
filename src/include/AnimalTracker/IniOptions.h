@@ -12,10 +12,11 @@
 
 class IniOptions : public IInfoPersister {
 public:
-	IniOptions( std::string const& generalInifile);
+	IniOptions(std::string const& generalInifile);
 
 	std::vector<std::unique_ptr<IInfo>> LoadInfo() const;
 	void StoreInfos(std::vector<const IInfo*> infos) const override;
+	const char* GetLocale() const;
 
 private:
 	static char const* const generalSectionName;
@@ -28,4 +29,5 @@ private:
 	CSimpleIniA m_generalIni{};
 	std::string m_langFilePath{};
 	std::string m_stateFilePath{};
+	const char* m_locale;
 };

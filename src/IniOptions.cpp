@@ -25,7 +25,8 @@ char const* const IniOptions::languageSectionName{ "LANG" };
 char const* const IniOptions::animalSectionName{ "ANIMAL_RARITY" };
 char const* const IniOptions::categorySectionName{ "CATEGORY_RARITY" };
 
-IniOptions::IniOptions(std::string const & generalInifile)
+IniOptions::IniOptions(std::string const & generalInifile):
+	m_locale{ "en" }
 {
 	if (m_generalIni.LoadFile(generalInifile.c_str()) < 0) {
 		throw std::runtime_error{ "Error! Failed to load the ini file: " + generalInifile};
@@ -33,6 +34,13 @@ IniOptions::IniOptions(std::string const & generalInifile)
 
 	m_langFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "langFilePath", "eng.ini"));
 	m_stateFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "stateFilePath", "AnimalTracker/state.ini"));
+
+	CSimpleIniA langIni;
+	if (langIni.LoadFile(m_langFilePath.c_str()) < 0) {
+		spdlog::error("Failed to load the language file {}", m_langFilePath);
+		return;
+	};
+	m_locale = langIni.GetValue(generalSectionName, "LOCALE", "en");
 }
 
 std::vector<std::unique_ptr<IInfo>> IniOptions::LoadInfo() const
@@ -54,7 +62,7 @@ std::vector<std::unique_ptr<IInfo>> IniOptions::LoadInfo() const
 	std::map<RootCategory, IContainingInfo*> tempRootMap;
 	for (RootCategory const& category : ROOT_CATEGORIES) {
 		std::string name{ langIni.GetValue(languageSectionName, category._to_string(), category._to_string()) };
-		spdlog::debug("Read key {} in section {} in language file {}: {}", category._to_string(), languageSectionName, m_langFilePath, name);
+		spdlog::trace("Read key {} in section {} in language file {}: {}", category._to_string(), languageSectionName, m_langFilePath, name);
 		auto ptr{ std::make_unique<CategoryInfo>(
 			category._to_string(),
 			name,
@@ -73,7 +81,7 @@ std::vector<std::unique_ptr<IInfo>> IniOptions::LoadInfo() const
 	std::map<SubCategory, IContainingInfo*> tempSubMap;
 	for (auto const& sub_root_pair : SUB_CATEGORIES) {
 		std::string name{ langIni.GetValue(languageSectionName, sub_root_pair.first._to_string(), sub_root_pair.first._to_string()) };
-		spdlog::debug("Read key {} in section {} in language file {}: {}", sub_root_pair.first._to_string(), languageSectionName, m_langFilePath, name);
+		spdlog::trace("Read key {} in section {} in language file {}: {}", sub_root_pair.first._to_string(), languageSectionName, m_langFilePath, name);
 		auto ptr{ std::make_unique<CategoryInfo>(
 			sub_root_pair.first._to_string(),
 			name,
@@ -92,7 +100,7 @@ std::vector<std::unique_ptr<IInfo>> IniOptions::LoadInfo() const
 
 	for (auto const& animal_sub_pair : ANIMALS) {
 		std::string name{ langIni.GetValue(languageSectionName, animal_sub_pair.first._to_string(), animal_sub_pair.first._to_string()) };
-		spdlog::debug("Read key {} in section {} in language file {}: {}", animal_sub_pair.first._to_string(), languageSectionName, m_langFilePath, name);
+		spdlog::trace("Read key {} in section {} in language file {}: {}", animal_sub_pair.first._to_string(), languageSectionName, m_langFilePath, name);
 		auto ptr{ std::make_unique<AnimalInfo>(
 			animal_sub_pair.first,
 			name,
@@ -128,6 +136,11 @@ void IniOptions::StoreInfos(std::vector<const IInfo*> infos) const
 	if (stateIni.SaveFile(m_stateFilePath.c_str()) < 0) {
 		spdlog::warn("Unable to write to file {}! Check your file priviliges or configure a different output file.", m_stateFilePath);
 	}
+}
+
+const char* IniOptions::GetLocale() const
+{
+	return m_locale;
 }
 
 std::string IniOptions::ExpandEnvironmentVariables(const std::string& input)

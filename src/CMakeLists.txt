@@ -34,6 +34,7 @@ set(TARGET_HEADER
 	MenuItemTitle.h
 	NamesInfo.h
 	QualityFilter.h
+	StringComparator.h
 )
 
 set(TARGET_SOURCE
@@ -57,6 +58,7 @@ set(TARGET_SOURCE
 	MenuItemMenu.cpp
 	MenuItemTitle.cpp
 	QualityFilter.cpp
+	StringComparator.cpp
 )
 
 list(TRANSFORM TARGET_INTERFACE PREPEND "include/${TARGET_NAME}/")
@@ -90,6 +92,7 @@ target_compile_definitions(${TARGET_NAME}
 		NOMINMAX
 		NODRAWTEXT
 		WIN32_LEAN_AND_MEAN
+		SI_CONVERT_ICU
 )
 
 target_link_libraries(${TARGET_NAME}
