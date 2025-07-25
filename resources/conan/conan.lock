@@ -1,0 +1,14 @@
+{
+    "version": "0.5",
+    "requires": [
+        "spdlog/1.15.3#3ca0e9e6b83af4d0151e26541d140c86%1748617970.519",
+        "icu/77.1#43f25b72e5f6674601a3ed047b643d83%1750691618.918",
+        "fmt/11.2.0#579bb2cdf4a7607621beea4eb4651e0f%1746298708.362"
+    ],
+    "build_requires": [
+        "msys2/cci.latest#5b73b10144f73cc5bfe0572ed9be39e1%1751977009.857",
+        "cmake/4.0.3#95907e383685c6d282821fd474aba76b%1750094039.673"
+    ],
+    "python_requires": [],
+    "config_requires": []
+}
