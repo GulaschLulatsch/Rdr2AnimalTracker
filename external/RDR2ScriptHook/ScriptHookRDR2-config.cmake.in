@@ -1,9 +1,0 @@
-@PACKAGE_INIT@
-
-if(NOT TARGET ScriptHookRDR2::ScriptHookRDR2)
-	add_library(ScriptHookRDR2::ScriptHookRDR2 STATIC IMPORTED GLOBAL)
-	set_target_properties(ScriptHookRDR2::ScriptHookRDR2 PROPERTIES
-		IMPORTED_LOCATION "${PACKAGE_PREFIX_DIR}/lib/ScriptHookRDR2.lib"
-		INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/include"
-	)
-endif()
