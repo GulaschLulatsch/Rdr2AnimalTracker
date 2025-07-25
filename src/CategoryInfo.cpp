@@ -10,7 +10,7 @@
 #include "MenuItemCategory.h"
 #include "QualityFilter.h"
 
-#include <RDR2ScriptHook/enums.h>
+#include <ScriptHookRDR2/enums.h>
 
 #include <algorithm>
 #include <memory>
@@ -18,8 +18,6 @@
 #include <utility>
 #include <vector>
 
-const ContainedInfoAccess CategoryInfo::PARENT_ACCESS{};
-const ContainingInfoAccess CategoryInfo::CHILD_ACCESS{};
 
 CategoryInfo::CategoryInfo(
 	std::string const& key,

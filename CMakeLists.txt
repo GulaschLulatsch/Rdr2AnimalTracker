@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.0.3)
+cmake_minimum_required(VERSION 3.23)
 
 project(AnimalTracker LANGUAGES CXX C)
 
@@ -16,10 +16,10 @@ else()
 endif()
 
 
-find_package(spdlog REQUIRED)
-find_package(ICU REQUIRED)
-find_package(ScriptHookRDR2 REQUIRED PATHS external/ScriptHookRDR2)
-find_package(SimpleIni REQUIRED PATHS external/SimpleIni)
-find_package(better-enums REQUIRED PATHS external/better-enums)
+find_package(spdlog CONFIG REQUIRED)
+find_package(ICU CONFIG REQUIRED)
+find_package(ScriptHookRDR2 CONFIG REQUIRED PATHS external/ScriptHookRDR2)
+find_package(SimpleIni CONFIG REQUIRED PATHS external/SimpleIni)
+find_package(better-enums CONFIG REQUIRED PATHS external/better-enums)
 
 add_subdirectory(src)

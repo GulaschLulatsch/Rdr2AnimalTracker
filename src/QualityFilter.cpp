@@ -1,6 +1,6 @@
 #include "QualityFilter.h"
 
-#include <RDR2ScriptHook/enums.h>
+#include <ScriptHookRDR2/enums.h>
 
 QualityFilter::QualityFilter(int filter) :
 	m_filter{ ((filter & NOT_SET) > 0) ? NOT_SET : (filter & (POOR | GOOD | PERFECT )) }

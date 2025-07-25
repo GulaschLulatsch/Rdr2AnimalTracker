@@ -3,9 +3,9 @@
 #include <set>
 #include <map>
 
-#include <RDR2ScriptHook/types.h>
+#include <ScriptHookRDR2/types.h>
 
-#include "enum.h"
+#include <better-enums/enum.h>
 
 BETTER_ENUM(RootCategory, int,
 	CA_BIRD, CA_FISH, CA_MAMMAL, CA_REPTILE, CA_AMPHIBIAN

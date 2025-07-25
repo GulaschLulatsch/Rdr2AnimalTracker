@@ -5,10 +5,13 @@
 #include "IContainingInfo.h"
 #include "IInfo.h"
 #include "IInfoPersister.h"
+#include "IMenuItem.h"
 #include "QualityFilter.h"
 
-#include <RDR2ScriptHook/enums.h>
+#include <ScriptHookRDR2/enums.h>
+#include <ScriptHookRDR2/types.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -41,7 +44,6 @@ public:
 	void RotateQuality() override;
 
 	std::unique_ptr<IMenuItem> CreateMenuItem() override;
-
 private:
 	IContainingInfo* m_parentItem{ nullptr };
 
@@ -53,5 +55,4 @@ private:
 	QualityFilter m_filter;
 	IInfoPersister const& m_saveFile;
 
-	static const ContainedInfoAccess ACCESS;
 };

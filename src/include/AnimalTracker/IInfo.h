@@ -2,7 +2,7 @@
 
 #include "IMenuItem.h"
 
-#include <RDR2ScriptHook/enums.h>
+#include <ScriptHookRDR2/enums.h>
 
 #include <memory>
 #include <string>

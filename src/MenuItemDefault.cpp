@@ -4,8 +4,8 @@
 #include "IInfo.h"
 #include "MenuItemBase.h"
 
-#include <RDR2ScriptHook/enums.h>
-#include <RDR2ScriptHook/natives.h>
+#include <ScriptHookRDR2/enums.h>
+#include <ScriptHookRDR2/natives.h>
 
 #include <string>
 
@@ -29,10 +29,10 @@ MenuItemDefault::MenuItemDefault(std::string const& caption) :
 
 void MenuItemDefault::DrawQuality(const IInfo& info, float lineTop, float lineLeft) const
 {
-	static char* blipTextureDict{ "BLIPS" };
-	static char* blipPoorQuality{ "blip_animal_quality_01" };
-	static char* blipGoodQuality{ "blip_animal_quality_02" };
-	static char* blipPerfectQuality{ "blip_animal_quality_03" };
+	static const char* blipTextureDict{ "BLIPS" };
+	static const char* blipPoorQuality{ "blip_animal_quality_01" };
+	static const char* blipGoodQuality{ "blip_animal_quality_02" };
+	static const char* blipPerfectQuality{ "blip_animal_quality_03" };
 	static const ColorRgba colorDisabled{ 100, 100, 100, 150 };
 	static const ColorRgba colorPoor{ 230, 230, 230 };
 	static const ColorRgba colorGood{ 80, 165, 215 };

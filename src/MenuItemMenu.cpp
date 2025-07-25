@@ -8,7 +8,7 @@
 #include "IMenu.h"
 #include "MenuItemBase.h"
 
-#include <RDR2ScriptHook/natives.h>
+#include <ScriptHookRDR2/natives.h>
 
 #include <memory>
 #include <string>

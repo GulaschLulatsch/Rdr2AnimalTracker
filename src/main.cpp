@@ -1,11 +1,11 @@
-#include "RDR2ScriptHook\main.h"
+#include <ScriptHookRDR2\main.h>
 
 #include "AnimalTracker.h"
 #include "Keyboard.h"
 
 #include <Windows.h>
 
-BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID)
 {
 	switch (reason)
 	{

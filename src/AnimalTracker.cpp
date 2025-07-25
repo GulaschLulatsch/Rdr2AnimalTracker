@@ -7,10 +7,10 @@
 #include "MenuInput.h"
 #include "MenuItemTitle.h"
 
-#include <RDR2ScriptHook/enums.h>
-#include <RDR2ScriptHook/main.h>
-#include <RDR2ScriptHook/natives.h>
-#include <RDR2ScriptHook/types.h>
+#include <ScriptHookRDR2/enums.h>
+#include <ScriptHookRDR2/main.h>
+#include <ScriptHookRDR2/natives.h>
+#include <ScriptHookRDR2/types.h>
 
 #include <spdlog/common.h>
 #include <spdlog/sinks/rotating_file_sink.h>
@@ -212,5 +212,4 @@ void ScriptMain()
 	}
 	AnimalTracker animalTracker;
 	animalTracker.Run();
-	spdlog::shutdown();
 }

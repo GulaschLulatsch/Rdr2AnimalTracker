@@ -1,3 +1,25 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:2c4957827407ab13a1a0911ac3719ba48a2597ff5ebb4966c1a497102569b09a
-size 504
+#pragma once
+
+#include "IInfo.h"
+
+#include <memory>
+#include <vector>
+
+class IContainedInfo;
+class ContainedInfoAccess;
+
+class ContainingInfoAccess {
+	friend class IContainingInfo;
+private:
+	ContainingInfoAccess() = default;
+};
+
+class IContainingInfo : virtual public IInfo {
+public:
+	virtual ~IContainingInfo() = default;
+
+	virtual void AddContainedItem(std::unique_ptr<IContainedInfo> child) = 0;
+	virtual void UnsetQuality(std::vector<const IInfo*> & affectedInfos, ContainedInfoAccess const&) = 0;
+protected:
+	static constexpr const ContainingInfoAccess CHILD_ACCESS{};
+};

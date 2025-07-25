@@ -6,7 +6,7 @@
 #include "MenuController.h"
 #include "IInfo.h"
 
-#include <RDR2ScriptHook/types.h>
+#include <ScriptHookRDR2/types.h>
 
 #include <memory>
 #include <string>

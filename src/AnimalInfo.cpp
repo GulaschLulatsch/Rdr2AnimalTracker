@@ -9,14 +9,13 @@
 #include "MenuItemAnimal.h"
 #include "QualityFilter.h"
 
-#include <RDR2ScriptHook/enums.h>
+#include <ScriptHookRDR2/enums.h>
+#include <ScriptHookRDR2/types.h>
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-const ContainedInfoAccess AnimalInfo::ACCESS{};
 
 AnimalInfo::AnimalInfo(AnimalType hash, std::string const& name, bool isFish, QualityFilter filter, IInfoPersister const& saveFile) :
 	m_hash{ hash },
@@ -63,7 +62,7 @@ void AnimalInfo::RotateQuality()
 	std::vector<const IInfo*> affectedInfos{ this };
 
 	if (m_parentItem) {
-		m_parentItem->UnsetQuality(affectedInfos, ACCESS);
+		m_parentItem->UnsetQuality(affectedInfos, PARENT_ACCESS);
 	}
 	m_saveFile.StoreInfos(std::move(affectedInfos));
 }

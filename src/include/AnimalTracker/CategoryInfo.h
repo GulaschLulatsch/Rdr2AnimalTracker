@@ -8,7 +8,7 @@
 #include "ISandwichedInfo.h"
 #include "QualityFilter.h"
 
-#include <RDR2ScriptHook/enums.h>
+#include <ScriptHookRDR2/enums.h>
 
 #include <memory>
 #include <string>
@@ -54,7 +54,4 @@ private:
 	IInfoPersister const& m_saveFile;
 
 	std::vector<std::unique_ptr<IContainedInfo>> m_children;
-
-	static const ContainedInfoAccess PARENT_ACCESS;
-	static const ContainingInfoAccess CHILD_ACCESS;
 };

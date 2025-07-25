@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RDR2ScriptHook/enums.h>
+#include <ScriptHookRDR2/enums.h>
 
 class QualityFilter {
 public:

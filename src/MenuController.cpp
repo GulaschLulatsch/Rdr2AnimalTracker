@@ -3,7 +3,7 @@
 #include "IMenu.h"
 #include "DrawUtils.h"
 
-#include <RDR2ScriptHook/natives.h>
+#include <ScriptHookRDR2/natives.h>
 
 #include <string>
 #include <sysinfoapi.h>
@@ -51,7 +51,7 @@ void MenuController::DrawStatusText() const
 {
 	if (GetTickCount64() < m_statusTextMaxTicks)
 	{
-		UI::SET_TEXT_SCALE(0.55, 0.55);
+		UI::SET_TEXT_SCALE(0.55f, 0.55f);
 		UI::SET_TEXT_COLOR_RGBA(255, 255, 255, 255);
 		UI::SET_TEXT_CENTRE(1);
 		UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);

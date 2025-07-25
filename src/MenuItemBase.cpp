@@ -4,8 +4,8 @@
 #include "DrawUtils.h"
 #include "IMenu.h"
 
-#include <RDR2ScriptHook/main.h>
-#include <RDR2ScriptHook/natives.h>
+#include <ScriptHookRDR2/main.h>
+#include <ScriptHookRDR2/natives.h>
 
 #include <sysinfoapi.h>
 

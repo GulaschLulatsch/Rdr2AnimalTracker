@@ -1,11 +1,12 @@
-#include "DrawUtils.h"
 #include "ColorRgba.h"
+#include "DrawUtils.h"
 
 #include <ScriptHookRDR2/natives.h>
 
+#include <string>
+
 void DrawUtils::DrawText(float x, float y, std::string const& str){
-	char* nonConstPtr{ str.empty() ? "" : &str[0]};
-	UI::DRAW_TEXT(GAMEPLAY::CREATE_STRING(10, "LITERAL_STRING", nonConstPtr), x, y);
+	UI::DRAW_TEXT(GAMEPLAY::CREATE_STRING(10, const_cast<char*>("LITERAL_STRING"), const_cast<char*>(str.c_str())), x, y);
 }
 
 void DrawUtils::DrawRect(float x, float y, float width, float height, ColorRgba color) {

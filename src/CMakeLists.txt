@@ -71,6 +71,11 @@ set_target_properties(${TARGET_NAME}
 		LINKER_LANGUAGE CXX
 )
 
+target_compile_options(${TARGET_NAME} 
+	PRIVATE
+		/std:c11
+		/Zc:preprocessor
+)
 target_sources(${TARGET_NAME}
 	PRIVATE
 		${TARGET_SOURCE}
@@ -90,9 +95,9 @@ target_compile_definitions(${TARGET_NAME}
 
 target_link_libraries(${TARGET_NAME}
 	PRIVATE
+		ScriptHookRDR2::ScriptHookRDR2
 		spdlog::spdlog 
 		icu::icu 
-		ScriptHookRDR2::ScriptHookRDR2
 		SimpleIni::SimpleIni
 		better-enums::better-enums
 )
