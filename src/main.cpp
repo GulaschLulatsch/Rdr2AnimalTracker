@@ -1,3 +1,22 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:3b99e023cf6a71b6a4ddef5725080c11dad97cf224e640b461099f731e02ffda
-size 478
+#include "RDR2ScriptHook\main.h"
+
+#include "AnimalTracker.h"
+#include "Keyboard.h"
+
+#include <Windows.h>
+
+BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
+{
+	switch (reason)
+	{
+	case DLL_PROCESS_ATTACH:
+		scriptRegister(hInstance, ScriptMain);
+		keyboardHandlerRegister(Keyboard::OnKeyboardMessage);
+		break;
+	case DLL_PROCESS_DETACH:
+		scriptUnregister(hInstance);
+		keyboardHandlerUnregister(Keyboard::OnKeyboardMessage);
+		break;
+	}		
+	return TRUE;
+}
