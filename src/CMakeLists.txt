@@ -93,6 +93,7 @@ target_compile_definitions(${TARGET_NAME}
 		NODRAWTEXT
 		WIN32_LEAN_AND_MEAN
 		SI_CONVERT_ICU
+		_UNICODE
 )
 
 target_link_libraries(${TARGET_NAME}
