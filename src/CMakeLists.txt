@@ -73,8 +73,7 @@ set_target_properties(${TARGET_NAME}
 
 target_compile_options(${TARGET_NAME} 
 	PRIVATE
-		/std:c11
-		/Zc:preprocessor
+		/Zc:preprocessor # required for extra macro argument for better-enums
 )
 target_sources(${TARGET_NAME}
 	PRIVATE
@@ -96,10 +95,10 @@ target_compile_definitions(${TARGET_NAME}
 target_link_libraries(${TARGET_NAME}
 	PRIVATE
 		ScriptHookRDR2::ScriptHookRDR2
-		spdlog::spdlog 
-		icu::icu 
 		SimpleIni::SimpleIni
 		better-enums::better-enums
+		spdlog::spdlog 
+		icu::icu 
 )
 
 target_include_directories(${TARGET_NAME} PRIVATE    
