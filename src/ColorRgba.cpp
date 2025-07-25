@@ -1,3 +1,27 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:682c579910424750328e543c4de5c68995c6cb25450cb3613ad90bc5bdb564f8
-size 562
+#include "ColorRgba.h"
+
+#include <utility>
+
+ColorRgba::ColorRgba() :
+	r{ 0 },
+	g{ 0 },
+	b{ 0 },
+	a{ 255 }
+{}
+
+ColorRgba::ColorRgba(
+	unsigned char red, 
+	unsigned char green, 
+	unsigned char blue, 
+	unsigned char alpha
+) :
+	r{ red }, g{ green }, b{ blue }, a{ alpha }
+{}
+
+ColorRgba ColorRgba::adjustBrightness(double factor) const
+{
+	auto adjust = [factor](unsigned char c) -> unsigned char {
+		return static_cast<unsigned char>((std::max)(0.0, (std::min)(255.0, static_cast<double>(c) *factor)));
+		};
+	return ColorRgba{ adjust(r), adjust(g), adjust(b), a };
+}

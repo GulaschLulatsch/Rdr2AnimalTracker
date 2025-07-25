@@ -1,3 +1,25 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:75268f87315d4a37aa5f4413541694f284e765e9b3a1152c7417340fa4533975
-size 477
+#pragma once
+
+#include "IMenu.h"
+
+#include "MenuItemDefault.h"
+
+#include <memory>
+#include <string>
+
+class MenuController;
+
+class MenuItemMenu : public MenuItemDefault
+{
+public:
+	virtual ~MenuItemMenu() = default;
+
+	virtual void OnDraw(float lineTop, float lineLeft, bool active) const override;
+
+	void OnRight(MenuController* controller) override;
+
+protected:
+	MenuItemMenu(std::string const& caption, std::unique_ptr<IMenu> menu);
+private:
+	std::unique_ptr<IMenu> m_menu;
+};

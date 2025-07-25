@@ -1,3 +1,36 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e4777a7f4af2a36f05afe7cdd37942ee57464122c83f31874adb15a729be9404
-size 573
+#pragma once
+
+#include "IMenu.h"
+
+#include "windows.h"
+
+#include <string>
+#include <vector>
+
+class MenuController
+{
+public:
+	MenuController() = default;
+
+	bool HasActiveMenu() const;
+	void PushMenu(IMenu* menu);
+	void PopMenu();
+	void SetStatusText(std::string const& text, int ms);
+	
+	void Update();
+
+private:
+	std::vector<IMenu*> m_menuStack{};
+
+	ULONGLONG	m_inputTurnOnTime{ 0 };
+
+	std::string	m_statusText{};
+	ULONGLONG	m_statusTextMaxTicks{ 0 };
+
+	bool InputIsOnWait() const;
+	IMenu* GetActiveMenu();
+	void DrawStatusText() const;
+	void OnDraw();
+	void OnInput();
+};
+

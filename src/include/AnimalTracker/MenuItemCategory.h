@@ -1,3 +1,27 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:b7e141087f0e23ac1d82f99c90a12168cb9dd56899bd2dcffea4b6850f7ae398
-size 504
+#pragma once
+
+#include "MenuItemMenu.h"
+
+#include "CategoryInfo.h"
+#include "EMenuItemType.h"
+#include "IMenu.h"
+
+#include <memory>
+
+class MenuItemCategory : public MenuItemMenu
+{
+public:
+	MenuItemCategory(
+		CategoryInfo& categoryInfo,
+		std::unique_ptr<IMenu> menu
+	);
+
+	const CategoryInfo& GetCategoryInfo() const;
+
+	EMenuItemType GetClass() const override;
+	void OnDraw(float lineTop, float lineLeft, bool active) const override;
+	void OnSelect() override;
+
+private:
+	CategoryInfo& m_categoryInfo;
+};

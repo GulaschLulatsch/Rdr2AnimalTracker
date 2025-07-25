@@ -1,3 +1,29 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:38cef834be91450273ab1f99645fec4e1b1d8cb7921284d36b9531b562ac2bff
-size 638
+#pragma once
+
+#include "ColorRgba.h"
+#include "MenuItemBase.h"
+#include "IInfo.h"
+
+#include <string>
+
+class MenuItemDefault : public MenuItemBase
+{
+public:
+	std::string const& GetCaption() const override; 
+protected:
+	MenuItemDefault(std::string const& caption);
+
+	void DrawQuality(const IInfo& info, float lineTop, float lineLeft) const;
+private:
+
+	static const float ITEM_WIDTH;
+	static const float ITEM_HEIGHT;
+	static const float TEXT_LEFT_MARGIN;
+
+	static const ColorRgba RECT_COLOR;
+	static const ColorRgba TEXT_COLOR;
+	static const ColorRgba RECT_COLOR_ACTIVE;
+	static const ColorRgba TEXT_COLOR_ACTIVE;
+
+	std::string	m_caption;
+};

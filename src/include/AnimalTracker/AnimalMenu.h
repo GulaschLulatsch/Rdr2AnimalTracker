@@ -1,3 +1,25 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:41c9ddfa380f04f0e860d9c7b1d94aaedf7999baafa2ca781ac57aee79004b31
-size 558
+#pragma once
+
+#include "MenuBase.h"
+
+#include "IMenuItem.h"
+#include "MenuItemAnimal.h"
+#include "MenuItemTitle.h"
+
+#include <memory>
+#include <vector>
+
+class AnimalMenu : public MenuBase {
+public:
+	AnimalMenu(std::unique_ptr<MenuItemTitle> title, float itemWidth = ITEM_WIDTH, float itemHeight = ITEM_HEIGHT);
+
+	void AddItem(std::unique_ptr<MenuItemAnimal> animalInfo);
+
+	// Inherited via MenuBase
+	IMenuItem* GetItem(size_t index) const override;
+
+	size_t GetItemCount() const override;
+
+private:
+	std::vector<std::unique_ptr<MenuItemAnimal>> m_items{};
+};

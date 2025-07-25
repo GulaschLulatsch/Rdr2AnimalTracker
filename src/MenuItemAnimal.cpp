@@ -1,3 +1,39 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:208b21e921ba103b7c15c5612d0400a82c63f47421c88b0807ba639f3e498cac
-size 767
+#include "MenuItemAnimal.h"
+
+#include "AnimalInfo.h"
+#include "EMenuItemType.h"
+#include "IMenu.h"
+#include "MenuItemBase.h"
+#include "MenuItemDefault.h"
+
+MenuItemAnimal::MenuItemAnimal(
+	AnimalInfo& animalInfo
+) :
+	MenuItemDefault{ animalInfo.GetName()},
+	m_animalInfo{ animalInfo }
+{}
+
+const AnimalInfo& MenuItemAnimal::GetAnimalInfo() const
+{
+	return m_animalInfo;
+}
+
+void MenuItemAnimal::OnSelect() {
+	m_animalInfo.RotateQuality();
+}
+
+EMenuItemType MenuItemAnimal::GetClass() const
+{
+	return EMenuItemType::Animal;
+}
+
+void MenuItemAnimal::OnDraw(float lineTop, float lineLeft, bool active) const
+{
+	MenuItemBase::OnDraw(lineTop, lineLeft, active); 
+	DrawQuality(m_animalInfo, lineTop, lineLeft);
+}
+
+void MenuItemAnimal::OnRight(MenuController*)
+{ 
+	OnSelect();
+}
