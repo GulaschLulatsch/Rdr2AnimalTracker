@@ -36,3 +36,13 @@ In Visual Studio you can use the GUI to build and the INSTALL target to install.
 From the command line, use `cmake --build build` to build from the project root, and `cmake --install build` to install the build artifacts to your Red Dead folder. 
 
 After that is run, simply start the game through Steam or wherever.
+
+# Credits 
+
+This project started out as a fork of Toxin4ick's "RDR2 Animals Finder" and has since then expanded on the scope. Be sure to check out his original version of the mod.
+
+Alexander Blade for developing the RDR2 Script hook used to inject this mod into the game aswell as the rest of the modding community for their research into the inner workings of the game, providing resources and making guides.
+
+# Contributions
+
+If you want to contribute feel free to create an issue or open a pull request with your changes. This is a hobby project of mine, so I might not always answer fast.
