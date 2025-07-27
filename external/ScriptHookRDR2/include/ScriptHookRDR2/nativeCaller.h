@@ -32,9 +32,17 @@ static inline void pushArgs(T arg, Ts... args)
 }
 
 template <typename R, typename... Ts>
-static inline R invoke(UINT64 hash, Ts... args)
+static inline std::enable_if_t<!std::is_void_v<R>, R> invoke(UINT64 hash, Ts... args)
 {
 	nativeInit(hash);
 	pushArgs(args...);
 	return *reinterpret_cast<R *>(nativeCall());
+}
+
+template <typename R = void, typename... Ts>
+static std::enable_if_t<std::is_void_v<R>, void> invoke(UINT64 hash, Ts... args)
+{
+	nativeInit(hash);
+	pushArgs(args...);
+	nativeCall();
 }

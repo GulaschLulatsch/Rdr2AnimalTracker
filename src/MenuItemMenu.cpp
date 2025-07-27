@@ -33,10 +33,10 @@ void MenuItemMenu::OnDraw(float lineTop, float lineLeft, bool active) const
 	MenuItemBase::OnDraw(lineTop, lineLeft, active);
 
 	ColorRgba color = active ? GetActiveTextColor() : GetTextColor();
-	UI::SET_TEXT_SCALE(0.0, GetItemHeight() * 8.0f);
-	UI::SET_TEXT_COLOR_RGBA(color.r, color.g, color.b, color.a);
-	UI::SET_TEXT_CENTRE(0);
-	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
+	UIDEBUG::_BG_SET_TEXT_SCALE(0.0, GetItemHeight() * 8.0f);
+	UIDEBUG::_BG_SET_TEXT_COLOR(color.r, color.g, color.b, color.a);
+	//UI::SET_TEXT_CENTRE(0); // no longer available ? 
+	//UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0); // no longer available ? 
 	DrawUtils::DrawText(lineLeft + GetItemWidth() - (32.f/1920.f)/*Margin*/, lineTop + GetItemHeight() / 4.5f, ">");
 
 	m_menu->SetPosition(lineLeft + GetItemWidth() + MenuBase::ROW_MARGIN, lineTop);

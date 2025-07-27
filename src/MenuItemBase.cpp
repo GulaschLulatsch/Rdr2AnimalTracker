@@ -13,10 +13,10 @@ void MenuItemBase::OnDraw(float lineTop, float lineLeft, bool active) const
 {
 	// text
 	ColorRgba color = active ? m_colorTextActive : m_colorText;
-	UI::SET_TEXT_SCALE(0.0, GetItemHeight() * 8.0f);
-	UI::SET_TEXT_COLOR_RGBA(color.r, color.g, color.b, color.a);
-	UI::SET_TEXT_CENTRE(0);
-	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
+	UIDEBUG::_BG_SET_TEXT_SCALE(0.0, GetItemHeight() * 8.0f);
+	UIDEBUG::_BG_SET_TEXT_COLOR(color.r, color.g, color.b, color.a);
+	//UI::SET_TEXT_CENTRE(0); // no longer available ? 
+	//UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0); // no longer available ? 
 	DrawUtils::DrawText(lineLeft + m_textLeftMargin, lineTop + GetItemHeight() / 4.5f, GetCaption());
 	// rect
 	DrawUtils::DrawRect(lineLeft, lineTop, GetItemWidth(), GetItemHeight(), active ? m_colorRectActive : m_colorRect);
