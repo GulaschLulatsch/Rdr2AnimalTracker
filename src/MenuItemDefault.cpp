@@ -33,7 +33,7 @@ void MenuItemDefault::DrawQuality(const IInfo& info, float lineTop, float lineLe
 	static const char* blipPoorQuality{ "blip_animal_quality_01" };
 	static const char* blipGoodQuality{ "blip_animal_quality_02" };
 	static const char* blipPerfectQuality{ "blip_animal_quality_03" };
-	static const ColorRgba colorDisabled{ 100, 100, 100, 150 };
+	static const ColorRgba colorDisabled{ 100, 100, 100, 200 };
 	static const ColorRgba colorPoor{ 230, 230, 230 };
 	static const ColorRgba colorGood{ 80, 165, 215 };
 	static const ColorRgba colorPerfect{ 255, 245, 145 };
