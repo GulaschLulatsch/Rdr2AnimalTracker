@@ -105,6 +105,9 @@ std::vector<AnimalInfo*> CategoryInfo::GetAllAnimalInfos()
 void CategoryInfo::SetQuality(const QualityFilter& quality, std::vector<const IInfo*>& affectedInfos, ContainingInfoAccess const&)
 {
 	m_filter = quality;
+	for (auto const& child : m_children) {
+		child->SetQuality(m_filter, affectedInfos, CHILD_ACCESS);
+	}
 	affectedInfos.push_back(this);
 }
 
@@ -117,5 +120,8 @@ void CategoryInfo::AddContainedItem(std::unique_ptr<IContainedInfo> child)
 void CategoryInfo::UnsetQuality(std::vector<const IInfo*>& affectedInfos, ContainedInfoAccess const&)
 {
 	m_filter.Unset();
+	if (m_parentItem) {
+		m_parentItem->UnsetQuality(affectedInfos, PARENT_ACCESS);
+	}
 	affectedInfos.push_back(this);
 }
