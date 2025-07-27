@@ -1,6 +1,6 @@
 # Animal Tracker for Red Dead Redemption 2
 
-This is the github project for the Animal Tracker mod. For instruction & help about mod usage head over to Nexus Mods [] TODO LINK.
+This is the github project for the Animal Tracker mod. For instruction & help about mod usage head over to the [Nexus Mods page](https://www.nexusmods.com/reddeadredemption2/mods/6827)
 
 ## Building
 
