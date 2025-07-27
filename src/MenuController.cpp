@@ -51,10 +51,10 @@ void MenuController::DrawStatusText() const
 {
 	if (GetTickCount64() < m_statusTextMaxTicks)
 	{
-		UI::SET_TEXT_SCALE(0.55f, 0.55f);
-		UI::SET_TEXT_COLOR_RGBA(255, 255, 255, 255);
-		UI::SET_TEXT_CENTRE(1);
-		UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
+		UIDEBUG::_BG_SET_TEXT_SCALE(0.55f, 0.55f);
+		UIDEBUG::_BG_SET_TEXT_COLOR(255, 255, 255, 255);
+		//UI::SET_TEXT_CENTRE(1); // no longer available ? 
+		//UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0); // no longer available ? 
 		DrawUtils::DrawText(0.5, 0.5, m_statusText);
 	}
 }

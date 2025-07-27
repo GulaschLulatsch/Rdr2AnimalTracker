@@ -29,5 +29,5 @@ private:
 	CSimpleIniA m_generalIni{};
 	std::string m_langFilePath{};
 	std::string m_stateFilePath{};
-	const char* m_locale;
+	std::string m_locale;
 };

@@ -73,7 +73,7 @@ void AnimalTracker::RemoveOrModifyBlip(bool showQuality, Blip animalBlip, Hash h
 	if (showQuality) {
 		MAP::BLIP_ADD_MODIFIER(animalBlip, hash);
 	}else{
-		MAP::REMOVE_BLIP(&animalBlip);
+		MAP::REMOVE_BLIP(animalBlip);
 	}
 }
 
@@ -104,7 +104,7 @@ void AnimalTracker::Update()
 	for (auto& pair : m_blips) {
 		auto currentIterator = currentBlips.find(pair.first);
 		if (currentIterator == currentBlips.end()) {
-			MAP::REMOVE_BLIP(&pair.second);
+			MAP::REMOVE_BLIP(pair.second);
 			m_blips.erase(pair.first);
 		}
 	}
@@ -135,7 +135,7 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	auto iterator = m_blips.find(ped);
 	if (iterator != m_blips.end()) { // Blip already exists for Ped
 		if(!qualityMatches || ENTITY::IS_ENTITY_DEAD(ped)) { // Remove Blip (This happens when animal quality changes between tick, ie. after being shot)
-			MAP::REMOVE_BLIP(&iterator->second);
+			MAP::REMOVE_BLIP(iterator->second);
 		}
 		if (qualityMatches) { // Update coordinates
 			Vector3 animCords = ENTITY::GET_ENTITY_COORDS(ped, TRUE, FALSE);

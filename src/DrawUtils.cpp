@@ -6,7 +6,7 @@
 #include <string>
 
 void DrawUtils::DrawText(float x, float y, std::string const& str){
-	UI::DRAW_TEXT(GAMEPLAY::CREATE_STRING(10, const_cast<char*>("LITERAL_STRING"), const_cast<char*>(str.c_str())), x, y);
+	UIDEBUG::_BG_DISPLAY_TEXT(MISC::VAR_STRING(10, "LITERAL_STRING",str.c_str()), x, y);
 }
 
 void DrawUtils::DrawRect(float x, float y, float width, float height, ColorRgba color) {

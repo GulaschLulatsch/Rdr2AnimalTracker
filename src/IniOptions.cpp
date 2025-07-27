@@ -32,7 +32,7 @@ IniOptions::IniOptions(std::string const & generalInifile):
 		throw std::runtime_error{ "Error! Failed to load the ini file: " + generalInifile};
 	}
 
-	m_langFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "langFilePath", "eng.ini"));
+	m_langFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "langFilePath", "en.ini"));
 	m_stateFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "stateFilePath", "AnimalTracker/state.ini"));
 
 	CSimpleIniA langIni;
@@ -140,7 +140,7 @@ void IniOptions::StoreInfos(std::vector<const IInfo*> infos) const
 
 const char* IniOptions::GetLocale() const
 {
-	return m_locale;
+	return m_locale.c_str();
 }
 
 std::string IniOptions::ExpandEnvironmentVariables(const std::string& input)
