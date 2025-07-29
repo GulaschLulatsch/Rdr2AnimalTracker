@@ -6,7 +6,7 @@ This is the github project for the Animal Tracker mod. For instruction & help ab
 
 ### Prerequisites
 
-The build process uses [Conan](conan.io) for dependency management. Conan is best installed through [pip](https://pypi.org/project/pip/). The project comes with a conan profile for an msvc compiler, so I recommend a Visual Studio installation on your system. However, we will be using cmake to generate our build system, so other compilers should work as well. If you know what you are doing you can also use Ninja, VSCode, Clang, .... As RDR2 is a Windows Game this project will require a Windows PC for building.
+The build process uses [Conan](https://conan.io) for dependency management. Conan is best installed through [pip](https://pypi.org/project/pip/). The project comes with a conan profile for an msvc compiler, so I recommend a Visual Studio installation on your system. However, we will be using cmake to generate our build system, so other compilers should work as well. If you know what you are doing you can also use Ninja, VSCode, Clang, .... As RDR2 is a Windows Game this project will require a Windows PC for building.
 
 ### Setup Dependencies & Generate Build System
 
