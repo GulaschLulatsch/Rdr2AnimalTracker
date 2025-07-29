@@ -33,7 +33,7 @@ Now you are all setup to work on or build the project. If you have Visual Studio
 
 In Visual Studio you can use the GUI to build and the INSTALL target to install.
 
-From the command line, use `cmake --build build` to build from the project root, and `cmake --install build` to install the build artifacts to your Red Dead folder. 
+From the command line, use `cmake --build build --config Release` to build from the project root, and `cmake --install build --config Release` to install the build artifacts to your Red Dead folder. 
 
 After that is run, simply start the game through Steam or wherever.
 
