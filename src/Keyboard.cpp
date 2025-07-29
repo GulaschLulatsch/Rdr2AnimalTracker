@@ -1,11 +1,14 @@
 #include "Keyboard.h"
+#include "KeyboardState.h"
 
 #include <atomic>
+#include <mutex>
 #include <cstdint>
 #include <sysinfoapi.h>
 #include <Windows.h>
 
 const int KEYS_SIZE = 255;
+std::mutex keyStateMutex{};
 
 struct KeyState{
 	std::atomic<bool> isDown{ false };
@@ -15,6 +18,7 @@ struct KeyState{
 	std::atomic<uint64_t> pressTimestampMs{ 0 };
 	uint64_t lastLongPressReported{ 0 };
 } keyStates[KEYS_SIZE];
+
 
 void Keyboard::OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow)
 {
@@ -35,9 +39,14 @@ void Keyboard::OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL is
 
 const int NOW_PERIOD = 100, MAX_DOWN = 5000, MAX_DOWN_LONG = 30000; // ms
 
-bool Keyboard::IsKeyDown(DWORD key)
+bool Keyboard::WasKeyPressed(DWORD key)
 {
 	return (key < KEYS_SIZE) ? keyStates[key].wasPressedOnce.exchange(false, std::memory_order_acquire) : false;
+}
+
+bool Keyboard::WasKeyReleased(DWORD key)
+{
+	return (key < KEYS_SIZE) ? keyStates[key].wasReleasedOnce.exchange(false, std::memory_order_acquire) : false;
 }
 
 bool Keyboard::IsKeyDownLong(DWORD key, uint64_t thresholdMs, uint64_t repeatMs)
@@ -61,17 +70,7 @@ bool Keyboard::IsKeyDownLong(DWORD key, uint64_t thresholdMs, uint64_t repeatMs)
 	return false;
 }
 
-bool Keyboard::IsKeyJustUp(DWORD key)
+bool Keyboard::IsKeyDown(DWORD key)
 {
-	return (key < KEYS_SIZE) ? keyStates[key].wasReleasedOnce.exchange(false, std::memory_order_acquire) : false;
-}
-
-void Keyboard::ClearOnFrame()
-{
-	//TODO is this working?
-	for (size_t i = 0; i < KEYS_SIZE; i+=1) {
-		KeyState& state{ keyStates[i] };
-		state.wasPressedOnce.store(false);
-		state.wasReleasedOnce.store(false);
-	}
+	return (key < KEYS_SIZE) ? keyStates[key].isDown.load(std::memory_order_acquire) : false;
 }

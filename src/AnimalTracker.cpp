@@ -56,8 +56,8 @@ AnimalTracker::AnimalTracker() :
 	//sort entries
 	StringComparator comp{ m_iniOptions.GetLocale() };
 	spdlog::debug("Sorting {} menu entries", menuEntries.size());
-	std::sort(menuEntries.begin(), menuEntries.end(), [&comp](const std::unique_ptr<IMenuItem>& a, const std::unique_ptr<IMenuItem>& b) {
-		return comp(a->GetCaption(), b->GetCaption());
+	std::sort(menuEntries.begin(), menuEntries.end(), [&comp](const std::unique_ptr<IMenuItem>& select, const std::unique_ptr<IMenuItem>& cancel) {
+		return comp(select->GetCaption(), cancel->GetCaption());
 	});
 
 	auto mainMenu{ std::make_unique<CategoryMenu>(std::make_unique<MenuItemTitle>("ANIMAL TRACKER")) };

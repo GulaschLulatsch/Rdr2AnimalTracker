@@ -14,6 +14,7 @@ set(TARGET_HEADER
 	AnimalInfo.h
 	AnimalMenu.h
 	AnimalTracker.h
+	ButtonMapping.h
 	Categories.h
 	CategoryInfo.h
 	CategoryMenu.h
@@ -22,7 +23,9 @@ set(TARGET_HEADER
 	DrawUtils.h
 	EMenuItemType.h
 	IniOptions.h
+	InputAction.h
 	Keyboard.h
+	KeyboardState.h
 	MenuBase.h
 	MenuController.h
 	MenuInput.h
@@ -32,7 +35,6 @@ set(TARGET_HEADER
 	MenuItemDefault.h
 	MenuItemMenu.h
 	MenuItemTitle.h
-	NamesInfo.h
 	QualityFilter.h
 	StringComparator.h
 )
@@ -41,12 +43,14 @@ set(TARGET_SOURCE
 	AnimalInfo.cpp
 	AnimalMenu.cpp
 	AnimalTracker.cpp
+	ButtonMapping.cpp
 	CategoryInfo.cpp
 	CategoryMenu.cpp
 	ColorRgba.cpp
 	DrawUtils.cpp
 	IniOptions.cpp
 	Keyboard.cpp
+	KeyboardState.cpp
 	main.cpp
 	MenuBase.cpp
 	MenuController.cpp

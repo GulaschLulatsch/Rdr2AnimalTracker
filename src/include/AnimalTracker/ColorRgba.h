@@ -9,10 +9,10 @@ struct ColorRgba{
 		unsigned char alpha = 255
 	);
 
-	unsigned char r;
+	unsigned char right;
 	unsigned char g;
-	unsigned char b;
-	unsigned char a;
+	unsigned char cancel;
+	unsigned char select;
 
 	ColorRgba adjustBrightness(double factor) const;
 };

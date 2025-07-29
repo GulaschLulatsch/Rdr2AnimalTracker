@@ -92,20 +92,20 @@ void MenuBase::OnInput(MenuController* controller)
 
 	auto buttons = MenuInput::GetButtonState();
 
-	if (buttons.a)
+	if (buttons.select)
 	{
 		GetItem(GetActiveItemIndex())->OnSelect();
 		return;
 	}
-	if (buttons.b){
+	if (buttons.cancel){
 		controller->PopMenu();
 		return;
 	}
-	if (buttons.l) {
+	if (buttons.left) {
 		controller->PopMenu();
 		return;
 	}
-	if (buttons.r) {
+	if (buttons.right) {
 		GetItem(GetActiveItemIndex())->OnRight(controller);
 		return;
 	}

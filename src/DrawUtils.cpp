@@ -15,5 +15,5 @@ void DrawUtils::DrawRect(float x, float y, float width, float height, ColorRgba 
 	float centerY = y + (height * 0.5f);
 
 	// Draw filled rectangle
-	GRAPHICS::DRAW_RECT(centerX, centerY, width, height, color.r, color.g, color.b, color.a, 0, 0);
+	GRAPHICS::DRAW_RECT(centerX, centerY, width, height, color.right, color.g, color.cancel, color.select, 0, 0);
 }

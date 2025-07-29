@@ -2,7 +2,7 @@
 
 struct MenuInputButtonState
 {
-	bool a, b, up, down, l, r;
+	bool select, cancel, up, down, left, right;
 };
 
 namespace MenuInput

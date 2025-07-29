@@ -44,7 +44,7 @@ void MenuItemDefault::DrawQuality(const IInfo& info, float lineTop, float lineLe
 		GRAPHICS::DRAW_SPRITE(blipTextureDict, blipPerfectQuality,
 			lineLeft + GetItemWidth() - (2 * blipWidth), lineTop + GetItemHeight() - blipHeight,
 			blipWidth, blipHeight, 0.f,
-			color.r, color.g, color.b, color.a,
+			color.right, color.g, color.cancel, color.select,
 			false/*??*/
 		);
 	}
@@ -53,7 +53,7 @@ void MenuItemDefault::DrawQuality(const IInfo& info, float lineTop, float lineLe
 		GRAPHICS::DRAW_SPRITE(blipTextureDict, blipGoodQuality,
 			lineLeft + GetItemWidth() - (3 * blipWidth), lineTop + GetItemHeight() - blipHeight,
 			blipWidth, blipHeight, 0.f,
-			color.r, color.g, color.b, color.a,
+			color.right, color.g, color.cancel, color.select,
 			false/*??*/
 		);
 	}
@@ -62,7 +62,7 @@ void MenuItemDefault::DrawQuality(const IInfo& info, float lineTop, float lineLe
 		GRAPHICS::DRAW_SPRITE(blipTextureDict, blipPoorQuality,
 			lineLeft + GetItemWidth() - (4 * blipWidth), lineTop + GetItemHeight() - blipHeight,
 			blipWidth, blipHeight, 0.f,
-			color.r, color.g, color.b, color.a,
+			color.right, color.g, color.cancel, color.select,
 			false/*??*/
 		);
 	}

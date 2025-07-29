@@ -14,7 +14,7 @@ void MenuItemBase::OnDraw(float lineTop, float lineLeft, bool active) const
 	// text
 	ColorRgba color = active ? m_colorTextActive : m_colorText;
 	UIDEBUG::_BG_SET_TEXT_SCALE(0.0, GetItemHeight() * 8.0f);
-	UIDEBUG::_BG_SET_TEXT_COLOR(color.r, color.g, color.b, color.a);
+	UIDEBUG::_BG_SET_TEXT_COLOR(color.right, color.g, color.cancel, color.select);
 	//UI::SET_TEXT_CENTRE(0); // no longer available ? 
 	//UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0); // no longer available ? 
 	DrawUtils::DrawText(lineLeft + m_textLeftMargin, lineTop + GetItemHeight() / 4.5f, GetCaption());

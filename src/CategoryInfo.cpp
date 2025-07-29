@@ -67,7 +67,7 @@ std::unique_ptr<IMenuItem> CategoryInfo::CreateMenuItem()
 		items.emplace_back(info->CreateMenuItem());
 	}
 
-	std::sort(items.begin(), items.end(), [](const auto& a, const auto& b) { return a->GetCaption() < b->GetCaption(); });
+	std::sort(items.begin(), items.end(), [](const auto& select, const auto& cancel) { return select->GetCaption() < cancel->GetCaption(); });
 
 	auto menu{ std::make_unique<CategoryMenu>(nullptr) };
 	for (auto& item : items) {
