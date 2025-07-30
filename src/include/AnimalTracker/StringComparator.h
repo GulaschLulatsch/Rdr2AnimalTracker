@@ -10,7 +10,7 @@ public:
 
 	explicit StringComparator(const char* localeName);
 
-	bool operator()(const std::string& select, const std::string& cancel);
+	bool operator()(const std::string& a, const std::string& b);
 private:
 
 	std::unique_ptr<icu::Collator> m_collator;

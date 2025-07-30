@@ -22,15 +22,15 @@ StringComparator::StringComparator(const char* localeName) :
 	}
 }
 
-bool StringComparator::operator()(const std::string& select, const std::string& cancel)
+bool StringComparator::operator()(const std::string& a, const std::string& b)
 {
-	icu::UnicodeString ua{ icu::UnicodeString::fromUTF8(select) };
-	icu::UnicodeString ub{ icu::UnicodeString::fromUTF8(cancel) };
+	icu::UnicodeString ua{ icu::UnicodeString::fromUTF8(a) };
+	icu::UnicodeString ub{ icu::UnicodeString::fromUTF8(b) };
 
 	UErrorCode status{ U_ZERO_ERROR };
 	UCollationResult result = m_collator->compare(ua, ub, status);
 	if (U_FAILURE(status)) {
-		spdlog::error("ICU comparison of UTF-8 unicode strings \"{}\" and \"{}\" failed", select, cancel);
+		spdlog::error("ICU comparison of UTF-8 unicode strings \"{}\" and \"{}\" failed", a, b);
 	}
 	return result == UCOL_LESS;
 }
