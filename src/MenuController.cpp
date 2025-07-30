@@ -31,15 +31,10 @@ void MenuController::SetStatusText(std::string const& text, int ms)
 	m_statusTextMaxTicks = GetTickCount64() + ms;
 }
 
-void MenuController::Update()
+void MenuController::Update(std::set<InputAction> const& input)
 {
 	OnDraw();
-	OnInput();
-}
-
-bool MenuController::InputIsOnWait() const
-{
-	return m_inputTurnOnTime > GetTickCount64();
+	OnInput(input);
 }
 
 IMenu* MenuController::GetActiveMenu()
@@ -72,12 +67,9 @@ void MenuController::OnDraw()
 	DrawStatusText();
 }
 
-void MenuController::OnInput()
+void MenuController::OnInput(std::set<InputAction> const& input)
 {
-	if (InputIsOnWait()){
-		return;
-	}
 	if (IMenu* menu = GetActiveMenu()){
-		menu->OnInput(this);
+		menu->OnInput(input, this);
 	}
 }

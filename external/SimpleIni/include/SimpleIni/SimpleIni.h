@@ -859,6 +859,14 @@ public:
         TNamesDepend &  a_values
         ) const;
 
+
+    bool GetAllLongValues(
+        const SI_CHAR* a_pSection,
+        const SI_CHAR* a_pKey,
+        std::list<long>& a_nValues,
+        long a_nDefault
+        ) const;
+
     /** Query the number of keys in a specific section. Note that if multiple
         keys are enabled, then this value may be different to the number of
         keys returned by GetAllKeys.
@@ -1192,6 +1200,11 @@ private:
     // copying is not permitted
     CSimpleIniTempl(const CSimpleIniTempl &); // disabled
     CSimpleIniTempl & operator=(const CSimpleIniTempl &); // disabled
+
+    long ConvertToLong(
+        const SI_CHAR* a_pValue,
+        long a_nDefault
+    ) const;
 
     /** Parse the data looking for a file comment and store it if found.
     */
@@ -2163,27 +2176,24 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetValue(
 
 template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
 long
-CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetLongValue(
-    const SI_CHAR * a_pSection,
-    const SI_CHAR * a_pKey,
-    long            a_nDefault,
-    bool *          a_pHasMultiple
-    ) const
+CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::ConvertToLong(
+    const SI_CHAR* a_pValue,
+    long a_nDefault
+) const
 {
     // return the default if we don't have a value
-    const SI_CHAR * pszValue = GetValue(a_pSection, a_pKey, NULL, a_pHasMultiple);
-    if (!pszValue || !*pszValue) return a_nDefault;
+    if (!a_pValue || !*a_pValue) return a_nDefault;
 
     // convert to UTF-8/MBCS which for a numeric value will be the same as ASCII
     char szValue[64] = { 0 };
     SI_CONVERTER c(m_bStoreIsUtf8);
-    if (!c.ConvertToStore(pszValue, szValue, sizeof(szValue))) {
+    if (!c.ConvertToStore(a_pValue, szValue, sizeof(szValue))) {
         return a_nDefault;
     }
 
     // handle the value as hex if prefaced with "0x"
     long nValue = a_nDefault;
-    char * pszSuffix = szValue;
+    char* pszSuffix = szValue;
     if (szValue[0] == '0' && (szValue[1] == 'x' || szValue[1] == 'X')) {
         if (!szValue[2]) return a_nDefault;
         nValue = strtol(&szValue[2], &pszSuffix, 16);
@@ -2193,11 +2203,24 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetLongValue(
     }
 
     // any invalid strings will return the default value
-    if (*pszSuffix) { 
-        return a_nDefault; 
+    if (*pszSuffix) {
+        return a_nDefault;
     }
 
     return nValue;
+}
+
+template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+long
+CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetLongValue(
+    const SI_CHAR * a_pSection,
+    const SI_CHAR * a_pKey,
+    long            a_nDefault,
+    bool *          a_pHasMultiple
+    ) const
+{
+    // return the default if we don't have a value
+    return ConvertToLong(GetValue(a_pSection, a_pKey, NULL, a_pHasMultiple), a_nDefault);
 }
 
 template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
@@ -2387,6 +2410,26 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::GetAllValues(
         }
     }
 
+    return true;
+}
+
+template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
+bool
+CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetAllLongValues(
+    const SI_CHAR* a_pSection,
+    const SI_CHAR* a_pKey,
+    std::list<long>& a_nValues,
+    long a_nDefault
+) const
+{
+    TNamesDepend values{};
+    if (!GetAllValues(a_pSection, a_pKey, values)) {
+        return false;
+    }
+    a_nValues.clear();
+    for (const Entry& value : values) {
+        a_nValues.emplace_back(ConvertToLong(value.pItem, a_nDefault));
+    }
     return true;
 }
 

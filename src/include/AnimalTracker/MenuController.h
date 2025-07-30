@@ -17,20 +17,17 @@ public:
 	void PopMenu();
 	void SetStatusText(std::string const& text, int ms);
 	
-	void Update();
+	void Update(std::set<InputAction> const& input);
 
 private:
 	std::vector<IMenu*> m_menuStack{};
 
-	ULONGLONG	m_inputTurnOnTime{ 0 };
-
 	std::string	m_statusText{};
 	ULONGLONG	m_statusTextMaxTicks{ 0 };
 
-	bool InputIsOnWait() const;
 	IMenu* GetActiveMenu();
 	void DrawStatusText() const;
 	void OnDraw();
-	void OnInput();
+	void OnInput(std::set<InputAction> const& input);
 };
 

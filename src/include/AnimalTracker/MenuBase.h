@@ -2,9 +2,11 @@
 
 #include "IMenu.h"
 #include "IMenuItem.h"
+#include "InputAction.h"
 #include "MenuItemTitle.h"
 
 #include <memory>
+#include <set>
 
 class MenuController;
 
@@ -20,7 +22,7 @@ public:
 
 	void SetPosition(float distanceFromLeft, float distanceFromTop) override;
 	void OnDraw() const override;
-	void OnInput(MenuController* controller) override;
+	void OnInput(std::set<InputAction> const& inputs, MenuController* controller) override;
 
 	static constexpr const float ITEM_WIDTH{ 0.30f };
 	static constexpr const float ITEM_HEIGHT{ 0.05f };

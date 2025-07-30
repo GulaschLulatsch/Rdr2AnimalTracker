@@ -6,10 +6,12 @@
 #include "MenuController.h"
 #include "IInfo.h"
 
+#include "ButtonMapping.h"
+
 #include <ScriptHookRDR2/types.h>
 
 #include <memory>
-#include <string>
+#include <filesystem>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -28,7 +30,7 @@ private:
 
 	static void RemoveOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash);
 
-	static std::string const iniFilePath;
+	static std::filesystem::path const iniFilePath;
 
 	MenuController m_menuController;
 	IniOptions m_iniOptions;
@@ -36,7 +38,7 @@ private:
 	std::vector<std::unique_ptr<IInfo>> m_categories;
 	std::unordered_map<Hash, AnimalInfo*> m_animalInfos;
 	std::unique_ptr<IMenu> m_mainMenu;
-
+	std::vector<ButtonMapping> m_buttonMappings;
 };
 
 
