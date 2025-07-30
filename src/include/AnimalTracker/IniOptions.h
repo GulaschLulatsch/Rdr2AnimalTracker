@@ -1,15 +1,15 @@
 #pragma once
 
+#include "ButtonMapping.h"
 #include "IInfo.h"
 #include "IInfoPersister.h"
-#include "ButtonMapping.h"
 
 #include <SimpleIni\SimpleIni.h>
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
-#include <filesystem>
 
 class IniOptions : public IInfoPersister {
 public:
@@ -27,6 +27,8 @@ private:
 	static char const* const categorySectionName;
 	static char const* const buttonMappingsSectionName;
 	static char const* const withControlPrefix;
+	static char const* const withAltPrefix;
+	static char const* const withShiftPrefix;
 
 	static std::string ExpandEnvironmentVariables(const std::string& input); 
 

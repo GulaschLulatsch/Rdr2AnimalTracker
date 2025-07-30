@@ -42,10 +42,15 @@ std::set<InputAction> KeyboardState::GetMenuInputOnFrame(std::vector<ButtonMappi
 	std::set<InputAction> returnValue{};
 	for (ButtonMapping const& button : buttonMap) {
 		if (
-			keyStates.keyPressed[button.keyCode] && // base button needs to get pressed
-			(
+			keyStates.keyPressed[button.keyCode] && (// base button needs to get pressed
 				!button.withCtrl ||  // either control key is not set -> no additional criteria -> true
 				(keyStates.keyIsDown[VK_CONTROL] || keyStates.keyPressed[VK_CONTROL]) // or control button is either currently pressed down or was pressed during this frame
+			) && (
+				!button.withAlt || 
+				(keyStates.keyIsDown[VK_MENU] || keyStates.keyPressed[VK_MENU]) 
+			) && (
+				!button.withShift ||
+				(keyStates.keyIsDown[VK_SHIFT] || keyStates.keyPressed[VK_SHIFT] || keyStates.keyIsDown[VK_LSHIFT] || keyStates.keyPressed[VK_LSHIFT])
 			)
 		) {
 			returnValue.insert(button.action);
