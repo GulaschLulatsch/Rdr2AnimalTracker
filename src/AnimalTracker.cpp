@@ -116,6 +116,22 @@ void AnimalTracker::Update()
 	}
 }
 
+void SetBlipQualityModifier(Blip blip, ePedQuality quality) {
+	MAP::BLIP_REMOVE_MODIFIER(blip, 0); // removes all modifiers
+	if (quality <= ePedQuality::PQ_LOW) {
+		static const Hash blipModifierArea_solidWhite{ 0xA2814CC7 };
+		MAP::BLIP_ADD_MODIFIER(blip, blipModifierArea_solidWhite);
+	}
+	else if (quality == ePedQuality::PQ_MEDIUM) {
+		static const Hash blipModifierDebugBlue_solidBlue{ 0xF91DD38D };
+		MAP::BLIP_ADD_MODIFIER(blip, blipModifierDebugBlue_solidBlue);
+	}
+	else {
+		static const Hash blipModifierDebugYellow_solidYellow{ 0xA5C4F725 };
+		MAP::BLIP_ADD_MODIFIER(blip, blipModifierDebugYellow_solidYellow);
+	}
+}
+
 void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips)
 {
 	if (PED::IS_PED_HUMAN(ped))
@@ -142,15 +158,17 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	if (iterator != m_blips.end()) { // Blip already exists for Ped
 		if(!qualityMatches || ENTITY::IS_ENTITY_DEAD(ped)) { // Remove Blip (This happens when animal quality changes between tick, ie. after being shot)
 			MAP::REMOVE_BLIP(iterator->second);
+			return;
 		}
-		if (qualityMatches) { // Update coordinates
+		if (qualityMatches && MAP::_IS_BLIP_ATTACHED_TO_ANY_ENTITY(iterator->second)) { // Update coordinates
 			Vector3 animCords = ENTITY::GET_ENTITY_COORDS(ped, TRUE, FALSE);
 			MAP::SET_BLIP_COORDS(iterator->second, animCords.x, animCords.y, animCords.z);
+			SetBlipQualityModifier(iterator->second, quality);
 			currentBlips.insert(ped);
+			return;
 		}
-		return;
 	}
-	if (!qualityMatches || ENTITY::IS_ENTITY_DEAD(ped)) {
+	if (!qualityMatches || MAP::_DOES_ENTITY_HAVE_BLIP(ped) || ENTITY::IS_ENTITY_DEAD(ped)) {
 		return;
 	}
 	static const Hash unknownBlipHash{ 0x63351D54 };
@@ -158,25 +176,21 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	m_blips.insert({ ped, animalBlip });
 	currentBlips.insert(ped);
 
-
-	if (quality <= ePedQuality::PQ_LOW) {
-		static const Hash blipModifierArea_solidWhite{ 0xA2814CC7 };
-		MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierArea_solidWhite);
-	}
-	else if (quality == ePedQuality::PQ_MEDIUM) {
-		static const Hash blipModifierDebugBlue_solidBlue{ 0xF91DD38D };
-		MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugBlue_solidBlue);
-	}
-	else {
-		static const Hash blipModifierDebugYellow_solidYellow{ 0xA5C4F725 };
-		MAP::BLIP_ADD_MODIFIER(animalBlip, blipModifierDebugYellow_solidYellow);
-	}
+	SetBlipQualityModifier(animalBlip, quality);
 
 	static const Hash animalTexture{ MISC::GET_HASH_KEY("blip_animal") };
 	//static const Hash fishTexture{ MISC::GET_HASH_KEY("blip_mg_fishing") };	// although theses textures would fit for fishing / birds, their black backgrounds make them not usable
-	//static const Hash smallDotTexture{ MISC::GET_HASH_KEY("blip_event_riggs_camp") }; 
-	MAP::SET_BLIP_SPRITE(animalBlip, animalTexture, true);
-	MAP::SET_BLIP_SCALE(animalBlip, 0.8f); // Make Fish & birds smaller icons
+	//static const Hash birdTexture{ MISC::GET_HASH_KEY("blip_event_riggs_camp") }; 
+	//if (ENTITY::_GET_IS_BIRD(ped)) {
+	//	MAP::SET_BLIP_SPRITE(animalBlip, birdTexture, false);
+	//}
+	//else if (PED::_IS_META_PED_FISH(ped)) {
+	//	MAP::SET_BLIP_SPRITE(animalBlip, fishTexture, false);
+	//}
+	//else {
+		MAP::SET_BLIP_SPRITE(animalBlip, animalTexture, true);
+	//}
+	MAP::SET_BLIP_SCALE(animalBlip, 0.8f);
 
 	//MAP::_SET_BLIP_NAME(animalBlip, HUD::GET_STRING_FROM_HASH_KEY(animalType));
 	MAP::_SET_BLIP_NAME(animalBlip, animalInfo.GetName().c_str());
