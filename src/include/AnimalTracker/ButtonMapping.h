@@ -1,6 +1,9 @@
 #pragma once
 
+#include "InputAction.h"
+
 struct ButtonMapping {
-	bool withCtrl{ false };
+	InputAction action;
 	unsigned int keyCode;
+	bool withCtrl{ false };
 };

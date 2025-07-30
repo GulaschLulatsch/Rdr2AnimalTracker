@@ -28,7 +28,6 @@ set(TARGET_HEADER
 	KeyboardState.h
 	MenuBase.h
 	MenuController.h
-	MenuInput.h
 	MenuItemAnimal.h
 	MenuItemBase.h
 	MenuItemCategory.h
@@ -43,7 +42,6 @@ set(TARGET_SOURCE
 	AnimalInfo.cpp
 	AnimalMenu.cpp
 	AnimalTracker.cpp
-	ButtonMapping.cpp
 	CategoryInfo.cpp
 	CategoryMenu.cpp
 	ColorRgba.cpp
@@ -54,7 +52,6 @@ set(TARGET_SOURCE
 	main.cpp
 	MenuBase.cpp
 	MenuController.cpp
-	MenuInput.cpp
 	MenuItemAnimal.cpp
 	MenuItemBase.cpp
 	MenuItemCategory.cpp

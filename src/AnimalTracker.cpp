@@ -4,9 +4,9 @@
 #include "CategoryMenu.h"
 #include "IMenuItem.h"
 #include "MenuController.h"
-#include "MenuInput.h"
 #include "MenuItemTitle.h"
 #include "StringComparator.h"
+#include "Keyboard.h"
 
 #include <ScriptHookRDR2/enums.h>
 #include <ScriptHookRDR2/main.h>
@@ -28,14 +28,15 @@
 DWORD	vehUpdateTime;
 DWORD	pedUpdateTime;
 
-std::string const AnimalTracker::iniFilePath{ "AnimalTracker/AnimalTracker.ini" };
+std::filesystem::path const AnimalTracker::iniFilePath{ "AnimalTracker/AnimalTracker.ini" };
 
 AnimalTracker::AnimalTracker() :
 	m_menuController{},
 	m_iniOptions{ iniFilePath },
 	m_categories{ m_iniOptions.LoadInfo() },
 	m_animalInfos{},
-	m_mainMenu{ nullptr }
+	m_mainMenu{ nullptr },
+	m_buttonMappings{ m_iniOptions.LoadButtonMappings() }
 {
 	spdlog::info("Reading and Writing to ini finished. Internal state valid, building gui from {} elements", m_categories.size());
 	std::vector<std::unique_ptr<IMenuItem>> menuEntries{};
@@ -181,15 +182,16 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 
 void AnimalTracker::Run()
 {
-
 	while (true)
 	{
-		if (!m_menuController.HasActiveMenu() && MenuInput::MenuSwitchPressed())
+		std::set<InputAction> input = Keyboard::GetKeyboardState().GetMenuInputOnFrame(m_buttonMapping);
+		if (!m_menuController.HasActiveMenu() && input.contains(InputAction::MENU))
 		{
 			spdlog::info("Menu Opened");
+			input.erase(InputAction::MENU);
 			m_menuController.PushMenu(m_mainMenu.get());
 		}
-		m_menuController.Update();
+		m_menuController.Update(input);
 
 		Update();
 		WAIT(0);

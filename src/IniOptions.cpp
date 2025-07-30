@@ -7,7 +7,7 @@
 #include "IInfo.h"
 #include "QualityFilter.h"
 
-#include "SimpleIni/SimpleIni.h"
+#include <SimpleIni/SimpleIni.h>
 
 #include <spdlog/spdlog.h>
 
@@ -18,24 +18,29 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <filesystem>
+
 #include <Windows.h>
 
 char const* const IniOptions::generalSectionName{ "GENERAL" };
 char const* const IniOptions::languageSectionName{ "LANG" };
 char const* const IniOptions::animalSectionName{ "ANIMAL_RARITY" };
 char const* const IniOptions::categorySectionName{ "CATEGORY_RARITY" };
+char const* const IniOptions::buttonMappingsSectionName{ "CONTROLS" };
+char const* const IniOptions::withControlPrefix{"CTRL_"};
 
-IniOptions::IniOptions(std::string const & generalInifile):
+IniOptions::IniOptions(std::filesystem::path const & generalInifile):
+	m_generalIni{ true, true },
 	m_locale{ "en" }
 {
 	if (m_generalIni.LoadFile(generalInifile.c_str()) < 0) {
-		throw std::runtime_error{ "Error! Failed to load the ini file: " + generalInifile};
+		throw std::runtime_error{ ("Error! Failed to load the ini file: " + generalInifile.string()).c_str()};
 	}
 
 	m_langFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "langFilePath", "en.ini"));
 	m_stateFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "stateFilePath", "AnimalTracker/state.ini"));
 
-	CSimpleIniA langIni;
+	CSimpleIniA langIni{ true };
 	if (langIni.LoadFile(m_langFilePath.c_str()) < 0) {
 		spdlog::error("Failed to load the language file {}", m_langFilePath);
 		return;
@@ -48,7 +53,7 @@ std::vector<std::unique_ptr<IInfo>> IniOptions::LoadInfo() const
 	std::vector<std::unique_ptr<IInfo>> returnVector{};
 	std::vector<const IInfo*> storeVector{}; // to write back result in the end
 
-	CSimpleIniA langIni;
+	CSimpleIniA langIni{ true };
 	if (langIni.LoadFile(m_langFilePath.c_str()) < 0) {
 		spdlog::error("Failed to load the language file {}", m_langFilePath);
 		throw std::runtime_error{ std::string{ "Error! Failed to load the language file: " } + m_langFilePath };
@@ -120,6 +125,43 @@ std::vector<std::unique_ptr<IInfo>> IniOptions::LoadInfo() const
 	return returnVector;
 }
 
+std::vector<ButtonMapping> IniOptions::LoadButtonMappings() const
+{
+	std::vector<ButtonMapping> returnVector{};
+	std::list<CSimpleIniA::Entry> keyList{};
+	if (!m_generalIni.GetAllKeys(buttonMappingsSectionName, keyList)) {
+		spdlog::error("{} section missing in general ini", buttonMappingsSectionName);
+		throw std::runtime_error{ std::string{ "Controls Section missing in ini" } };
+	}
+	for (CSimpleIniA::Entry const& key : keyList) {
+
+		bool withControl{ false };
+		std::string keyString{ key.pItem };
+		if (keyString.starts_with(withControlPrefix)) {
+			withControl = true;
+			keyString = keyString.substr(std::string{ withControlPrefix }.size());
+		}
+
+		better_enums::optional<InputAction> action = InputAction::_from_string_nothrow(keyString.c_str());
+		if (!action) {
+			spdlog::warn("Unkown control istruction in ini file: {}", key.pItem);
+			continue;
+		}
+
+		std::list<CSimpleIniA::Entry> valueList{};
+		if (!m_generalIni.GetAllValues(buttonMappingsSectionName, key.pItem, valueList)) {
+			spdlog::error("Unable to retrieve items of key {} in section {} of the general ini", buttonMappingsSectionName, key.pItem);
+			throw std::runtime_error{ std::string{ "Unable to read values from ini" } };
+		}
+		
+		for (CSimpleIniA::Entry const& value : valueList) {
+			value. // TODO DOES NOT WORK YET; HOW TO GET MULTIPLE VALUES AS LONG??
+			returnVector.push_back(ButtonMapping{ .action = action.value(), .withCtrl = withControl, .keyCode = });
+		}
+	}
+	return returnVector;
+}
+
 void IniOptions::StoreInfos(std::vector<const IInfo*> infos) const
 {
 	CSimpleIniA stateIni;
@@ -132,6 +174,9 @@ void IniOptions::StoreInfos(std::vector<const IInfo*> infos) const
 			entry->GetKey().c_str(),
 			static_cast<long>(entry->GetQualityBitmask())
 		);
+	}
+	if (!std::filesystem::exists(m_stateFilePath.parent_path())) {
+		std::filesystem::create_directories(m_stateFilePath.parent_path());
 	}
 	if (stateIni.SaveFile(m_stateFilePath.c_str()) < 0) {
 		spdlog::warn("Unable to write to file {}! Check your file priviliges or configure a different output file.", m_stateFilePath);

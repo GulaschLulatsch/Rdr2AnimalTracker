@@ -3,12 +3,13 @@
 #include "ColorRgba.h"
 #include "DrawUtils.h"
 #include "IMenuItem.h"
+#include "InputAction.h"
 #include "MenuController.h"
-#include "MenuInput.h"
 #include "MenuItemTitle.h"
 
 #include <algorithm>
 #include <memory>
+#include <set>
 #include <utility>
 
 
@@ -83,35 +84,32 @@ void MenuBase::OnDraw() const
 	
 }
 
-void MenuBase::OnInput(MenuController* controller)
+void MenuBase::OnInput(std::set<InputAction> const& inputs, MenuController* controller)
 {
 	const size_t itemCount = GetItemCount();
 	const size_t itemsLeft = itemCount % ROWS_PER_SCREEN;
 	const size_t screenCount = (itemCount / ROWS_PER_SCREEN) + (itemsLeft ? 1 : 0);
 	const size_t lineCountLastScreen = itemsLeft ? itemsLeft : ROWS_PER_SCREEN;
-
-	auto buttons = MenuInput::GetButtonState();
-
-	if (buttons.select)
-	{
-		GetItem(GetActiveItemIndex())->OnSelect();
-		return;
-	}
-	if (buttons.cancel){
-		controller->PopMenu();
-		return;
-	}
-	if (buttons.left) {
-		controller->PopMenu();
-		return;
-	}
-	if (buttons.right) {
-		GetItem(GetActiveItemIndex())->OnRight(controller);
-		return;
-	}
-	if (buttons.up){
-		if (m_activeRowIndex == 0){
-			if (m_activeScreenIndex == 0){
+	
+	for (InputAction const& input : inputs) {
+		switch (input) {
+		case InputAction::SELECT:
+			GetItem(GetActiveItemIndex())->OnSelect();
+			return;
+		case InputAction::RIGHT:
+			GetItem(GetActiveItemIndex())->OnRight(controller);
+			return;
+		case InputAction::CANCEL:
+		case InputAction::LEFT:
+		case InputAction::MENU:
+			controller->PopMenu();
+			return;
+		case InputAction::UP:
+			if (m_activeRowIndex != 0) {
+				m_activeRowIndex -= 1;
+				return;
+			}
+			if (m_activeScreenIndex == 0) {
 				m_activeScreenIndex = screenCount - 1;
 				m_activeRowIndex = lineCountLastScreen - 1;
 				return;
@@ -119,26 +117,20 @@ void MenuBase::OnInput(MenuController* controller)
 			m_activeScreenIndex -= 1;
 			m_activeRowIndex = ROWS_PER_SCREEN - 1;
 			return;
-		}
-		m_activeRowIndex -= 1;
-		return;
-	}
-	if (buttons.down)
-	{
-		bool isFinalPage{ m_activeScreenIndex == (screenCount - 1) };
-		size_t currentPageMaxIndex{ isFinalPage ? lineCountLastScreen - 1 : ROWS_PER_SCREEN -1 };
-		if (m_activeRowIndex == currentPageMaxIndex)
-		{
-			if (isFinalPage) {
-				m_activeScreenIndex = 0;
-			}
-			else{
-				m_activeScreenIndex++;
+		case InputAction::DOWN:
+			bool isFinalPage{ m_activeScreenIndex == (screenCount - 1) };
+			size_t currentPageMaxIndex{ isFinalPage ? lineCountLastScreen - 1 : ROWS_PER_SCREEN - 1 };
+			if (m_activeRowIndex != currentPageMaxIndex) {
+				m_activeRowIndex += 1;
+				return;
 			}
 			m_activeRowIndex = 0;
+			if (isFinalPage) {
+				m_activeScreenIndex = 0;
+				return;
+			}
+			m_activeScreenIndex++;
 			return;
 		}
-		m_activeRowIndex += 1;
-		return;
 	}
 }

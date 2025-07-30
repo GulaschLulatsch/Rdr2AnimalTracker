@@ -1,12 +1,17 @@
+#include "ButtonMapping.h"
+#include "InputAction.h"
 #include "KeyboardState.h"
+
+#include <Windows.h>
+
+#include <vector>
+#include <set>
 
 KeyboardState::KeyboardState()
 {
 	m_state.keyIsDown.fill(false);
 	m_state.keyPressed.fill(false);
 	m_state.keyReleased.fill(false);
-	m_state.pressTimestampMs.fill(0ull);
-	m_state.lastLongPressReported.fill(0ull);
 }
 void KeyboardState::OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow) {
 	(void)isWithAlt, isExtended, scanCode, repeats;
@@ -17,7 +22,6 @@ void KeyboardState::OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BO
 		std::unique_lock lock{ m_mutex };
 		m_state.keyIsDown[key] = true;
 		m_state.keyPressed[key] = true;
-		m_state.pressTimestampMs[key] = GetTickCount64();
 	}
 	else if (isUpNow && wasDownBefore) {
 		std::unique_lock lock{ m_mutex };
@@ -26,9 +30,9 @@ void KeyboardState::OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BO
 	}
 }
 
-std::set<InputAction> KeyboardState::GetMenuInputOnFrame(std::multimap<InputAction, ButtonMapping> const& buttonMap)
+std::set<InputAction> KeyboardState::GetMenuInputOnFrame(std::vector<ButtonMapping> const& buttonMap)
 {
-	keyStates keyStates{};
+	KeyStates keyStates{};
 	{
 		std::unique_lock lock{ m_mutex };
 		keyStates = m_state; // make local copy
@@ -36,7 +40,7 @@ std::set<InputAction> KeyboardState::GetMenuInputOnFrame(std::multimap<InputActi
 		m_state.keyReleased.fill(false);
 	}
 	std::set<InputAction> returnValue{};
-	for (auto const& [action, button] : buttonMap) {
+	for (ButtonMapping const& button : buttonMap) {
 		if (
 			keyStates.keyPressed[button.keyCode] && // base button needs to get pressed
 			(
@@ -44,7 +48,7 @@ std::set<InputAction> KeyboardState::GetMenuInputOnFrame(std::multimap<InputActi
 				(keyStates.keyIsDown[VK_CONTROL] || keyStates.keyPressed[VK_CONTROL]) // or control button is either currently pressed down or was pressed during this frame
 			)
 		) {
-			returnValue.insert(action);
+			returnValue.insert(button.action);
 		}
 	}
 	return returnValue;
