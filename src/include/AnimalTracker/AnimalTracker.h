@@ -28,8 +28,6 @@ private:
 
 	void UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentBlips);
 
-	static void RemoveOrModifyBlip(bool showQuality, Blip animalBlip, Hash hash);
-
 	static std::filesystem::path const iniFilePath;
 
 	MenuController m_menuController;
