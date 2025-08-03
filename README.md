@@ -43,6 +43,8 @@ This project started out as a fork of Toxin4ick's "RDR2 Animals Finder" and has 
 
 Alexander Blade for developing the RDR2 Script hook used to inject this mod into the game aswell as the rest of the modding community for their research into the inner workings of the game, providing resources and making guides.
 
+chinamonkey002 for providing the chinese translation
+
 # Contributions
 
 If you want to contribute feel free to create an issue or open a pull request with your changes. This is a hobby project of mine, so I might not always answer fast.
