@@ -12,6 +12,8 @@
 
 #include <ScriptHookRDR2/enums.h>
 
+#include <spdlog/spdlog.h>
+
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -51,17 +53,21 @@ bool CategoryInfo::QualityMatches(ePedQuality quality) const
 void CategoryInfo::RotateQuality() {
 	m_filter.Rotate();
 	std::vector<const IInfo*> affectedItems{ this };
+	spdlog::trace("Rotating category {} quality, updating {} child items", GetName(), m_children.size());
 	for (auto const& child : m_children) {
 		child->SetQuality(m_filter, affectedItems, CHILD_ACCESS);
 	}
 	if (m_parentItem) {
+		spdlog::trace("Rotating category {} quality, resetting parent {} quality filter", GetName(), m_parentItem->GetName());
 		m_parentItem->UnsetQuality(affectedItems, PARENT_ACCESS);
 	}
+	spdlog::trace("Quality rotation affected {} items", affectedItems.size());
 	m_saveFile.StoreInfos(std::move(affectedItems));
 }
 
 std::unique_ptr<IMenuItem> CategoryInfo::CreateMenuItem()
 {
+	spdlog::trace("Creating GUI item for category {}", GetName());
 	std::vector<std::unique_ptr<IMenuItem>> items{};
 	for (const auto& info : m_children) {
 		items.emplace_back(info->CreateMenuItem());

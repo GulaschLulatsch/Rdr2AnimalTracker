@@ -52,7 +52,7 @@ AnimalTracker::AnimalTracker() :
 		spdlog::debug("Menu item created for {}", entry->GetName());
 
 		auto infos{ entry->GetAllAnimalInfos() };
-		spdlog::debug("Received {} animal infos from entry {}", infos.size(), entry->GetName());
+		spdlog::debug("Read {} animal infos for entry {}", infos.size(), entry->GetName());
 
 		for (auto const& info : infos) {
 			m_animalInfos.insert({ info->GetHash(), info });
@@ -90,6 +90,12 @@ void AnimalTracker::Update()
 	peds.resize(ARR_SIZE) ;
 	int count = worldGetAllPeds(peds.data(), ARR_SIZE);
 	peds.resize(count);
+	if (count >= 1000) {
+		spdlog::debug("Read {} peds in tick. Consider increasing the read ped count", count);
+	}
+	else {
+		spdlog::trace("Read {} peds in tick", count);
+	}
 
 
 	std::unordered_set<Blip> currentBlips;
@@ -102,6 +108,7 @@ void AnimalTracker::Update()
 	for (auto& pair : m_blips) {
 		auto currentIterator = currentBlips.find(pair.first);
 		if (currentIterator == currentBlips.end()) {
+			spdlog::trace("Removing no longer valid blip");
 			MAP::REMOVE_BLIP(pair.second);
 			m_blips.erase(pair.first);
 		}
@@ -130,8 +137,8 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 
 	Hash animalType{ ENTITY::_GET_PED_ANIMAL_TYPE(ped) };
 
-	static const Hash unknownAnimalTypeMagicValue{ 4141559444 };
-	if (animalType == unknownAnimalTypeMagicValue) { // what the fuck is this magic value??
+	static const Hash animalTypeHorse{ 4141559444 };
+	if (animalType == animalTypeHorse) {
 		return;
 	}
 	auto animalInfoIterator{ m_animalInfos.find(animalType) };
@@ -147,6 +154,7 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 
 	if (auto iterator = m_blips.find(ped); iterator != m_blips.end()) { // Blip already exists for Ped
 		if(!qualityMatches || ENTITY::IS_ENTITY_DEAD(ped)) { // Remove Blip (This happens when animal quality changes between tick, ie. after being shot)
+			spdlog::trace("Removing ped for entity that is either dead or no longer matching the quality filter ({})", animalInfo.GetName());
 			MAP::REMOVE_BLIP(iterator->second);
 			return;
 		}
@@ -160,6 +168,7 @@ void AnimalTracker::UpdateBlipForPed(Ped ped, std::unordered_set<Blip>& currentB
 	if (!qualityMatches || MAP::_DOES_ENTITY_HAVE_BLIP(ped) || ENTITY::IS_ENTITY_DEAD(ped)) {
 		return;
 	}
+	spdlog::trace("Creating new blip for ped {:x}:{}", ped, animalInfo.GetName());
 	static const Hash unknownBlipHash{ 0x63351D54 };
 	Blip animalBlip = MAP::BLIP_ADD_FOR_ENTITY(unknownBlipHash, ped);
 	m_blips.insert({ ped, animalBlip });
@@ -211,14 +220,14 @@ void ScriptMain()
 
 		spdlog::set_pattern("[%Y-%m-%d %H:%M:%S] [%l] %v");
 		spdlog::set_level(spdlog::level::debug);
-		spdlog::flush_on(spdlog::level::info);
+		spdlog::flush_on(spdlog::level::debug);
 
-		spdlog::info("AnimalTracker starting - log initialized");
 	}
 	catch (...)
 	{
 		/*Do nothing if log init fails*/
 	}
+	spdlog::info("AnimalTracker starting - log initialized");
 	AnimalTracker animalTracker;
 	animalTracker.Run();
 }

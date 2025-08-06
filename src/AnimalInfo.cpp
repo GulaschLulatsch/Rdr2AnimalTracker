@@ -12,6 +12,8 @@
 #include <ScriptHookRDR2/enums.h>
 #include <ScriptHookRDR2/types.h>
 
+#include <spdlog/spdlog.h>
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -62,6 +64,7 @@ void AnimalInfo::RotateQuality()
 	std::vector<const IInfo*> affectedInfos{ this };
 
 	if (m_parentItem) {
+		spdlog::trace("Unseting quality of animal {}'s parent {}", GetName(), m_parentItem->GetName());
 		m_parentItem->UnsetQuality(affectedInfos, PARENT_ACCESS);
 	}
 	m_saveFile.StoreInfos(std::move(affectedInfos));

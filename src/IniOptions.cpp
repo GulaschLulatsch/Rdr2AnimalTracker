@@ -9,6 +9,8 @@
 #include "InputAction.h"
 #include "QualityFilter.h"
 
+#include <ScriptHookRDR2/natives.h>
+
 #include <SimpleIni/SimpleIni.h>
 
 #include <spdlog/spdlog.h>
@@ -39,16 +41,66 @@ char const* const IniOptions::withControlPrefix{"CTRL_"};
 char const* const IniOptions::withAltPrefix{ "ALT_" };
 char const* const IniOptions::withShiftPrefix{ "SHIFT_" };
 
+std::map<int, std::string> const LANGUAGE_MAP{ 
+	{0, "en"}, 
+	{1, "fr"}, 
+	{2, "de"}, 
+	{3, "it"},
+	{4, "es"},
+	{5, "pt"},
+	{6, "pl"},
+	{7, "ru"},
+	{8, "ko"},
+	{9, "cn"},	// taiwanese, same as simplified??
+	{10, "ja"},
+	{11, "es"},	// mexican, same as regular spanish?
+	{12, "cn"}
+};
+
 IniOptions::IniOptions(std::filesystem::path const & generalInifile):
 	m_generalIni{ true, true },
 	m_locale{ "en" }
 {
 	if (m_generalIni.LoadFile(generalInifile.c_str()) < 0) {
-		throw std::runtime_error{ ("Error! Failed to load the ini file: " + generalInifile.string())};
+		std::runtime_error exception{ ("Failed to load the ini file: " + generalInifile.string()) };
+		spdlog::critical("{}", exception.what());
+		throw exception;
 	}
 
-	m_langFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "langFilePath", "en.ini"));
+	std::string logLevelString = m_generalIni.GetValue(generalSectionName, "logLevel", "");
+	auto logLevel = spdlog::level::from_str(logLevelString);
+	if (logLevelString.empty() || ((logLevel == spdlog::level::off) && (logLevelString != "off"))) {
+		spdlog::set_level(spdlog::level::info);
+		spdlog::flush_on(spdlog::level::info);
+		spdlog::warn("\"logLevel\" in ini file {} is either not present or contains invalid value \"{}\". Using default Info loglevel.", generalInifile.string(), logLevelString);
+	}
+	else {
+		spdlog::info("Setting loglevel to \"{}\"", spdlog::level::to_string_view(logLevel));
+		spdlog::set_level(logLevel);
+		spdlog::flush_on(logLevel); 
+	}
+
+	// legacy behaviour, allows users to inject their custom translations
+	if (std::string langFile{ m_generalIni.GetValue(generalSectionName, "langFilePath", "") }; !langFile.empty()) {
+		spdlog::info("User provided language file path detected, overwriting automatic language detection. {}", langFile);
+		m_langFilePath = langFile;
+	}
+	else{
+		auto it{ LANGUAGE_MAP.find(LOCALIZATION::GET_CURRENT_LANGUAGE()) };
+		std::string const& langCode{ it == LANGUAGE_MAP.end() ? "en" : it->second };
+		spdlog::info("Detected language \"{}\"", it->second);
+		std::filesystem::path langFilePath = std::filesystem::path{ "AnimalTracker" } /  "Langs" / (langCode + ".ini");
+		if (!std::filesystem::exists(langFilePath)) {
+			m_langFilePath = langFilePath.parent_path() / "en.ini";
+			spdlog::warn("No translation file found for language code \"{}\". Fallback to english translation with file {}", langCode, m_langFilePath.string());
+		}
+		else {
+			m_langFilePath = std::move(langFilePath);
+			spdlog::debug("Using language file {}", m_langFilePath.string());
+		}
+	}
 	m_stateFilePath = ExpandEnvironmentVariables(m_generalIni.GetValue(generalSectionName, "stateFilePath", "AnimalTracker/state.ini"));
+	spdlog::debug("State file configured: {}", m_stateFilePath.string());
 
 	CSimpleIniA langIni{ true };
 	if (langIni.LoadFile(m_langFilePath.c_str()) < 0) {
@@ -56,6 +108,7 @@ IniOptions::IniOptions(std::filesystem::path const & generalInifile):
 		return;
 	};
 	m_locale = langIni.GetValue(generalSectionName, "LOCALE", "en");
+	spdlog::trace("Using locale {} for collation", m_locale);
 }
 
 std::vector<std::unique_ptr<IInfo>> IniOptions::LoadInfo() const
@@ -140,7 +193,7 @@ std::vector<ButtonMapping> IniOptions::LoadButtonMappings() const
 	std::vector<ButtonMapping> returnVector{};
 	std::list<CSimpleIniA::Entry> keyList{};
 	if (!m_generalIni.GetAllKeys(buttonMappingsSectionName, keyList)) {
-		spdlog::error("{} section missing in general ini", buttonMappingsSectionName);
+		spdlog::critical("{} section missing in general ini", buttonMappingsSectionName);
 		throw std::runtime_error{ std::string{ "Controls Section missing in ini" } };
 	}
 	for (CSimpleIniA::Entry const& key : keyList) {
@@ -151,16 +204,19 @@ std::vector<ButtonMapping> IniOptions::LoadButtonMappings() const
 		std::string keyString{ key.pItem };
 		for (;;) {
 			if (keyString.starts_with(withControlPrefix)) {
+				spdlog::trace("Control prefix in {}", keyString);
 				withControl = true;
 				keyString = keyString.substr(std::string_view{ withControlPrefix }.size());
 				continue;
 			}
 			if (keyString.starts_with(withAltPrefix)) {
+				spdlog::trace("Alt prefix in {}", keyString);
 				withAlt = true;
 				keyString = keyString.substr(std::string_view{ withAltPrefix }.size());
 				continue;
 			}
 			if (keyString.starts_with(withShiftPrefix)) {
+				spdlog::trace("Shift prefix in {}", keyString);
 				withShift = true;
 				keyString = keyString.substr(std::string_view{ withShiftPrefix }.size());
 				continue;
@@ -171,19 +227,19 @@ std::vector<ButtonMapping> IniOptions::LoadButtonMappings() const
 		better_enums::optional<InputAction> action = InputAction::_from_string_nothrow(keyString.c_str());
 		if (!action) {
 			static auto inputNames{ InputAction::_names() };
-			spdlog::warn("Unkown control instruction in ini file: {}. Valid values are: {}", key.pItem, fmt::join(inputNames, ", "));
+			spdlog::error("Unkown control instruction in ini file: {}. Valid values are: {}", key.pItem, fmt::join(inputNames, ", "));
 			continue;
 		}
 
 		std::list<long> valueList{};
 		if (!m_generalIni.GetAllLongValues(buttonMappingsSectionName, key.pItem, valueList, -1)) {
-			spdlog::error("Unable to retrieve items of key {} in section {} of the general ini", buttonMappingsSectionName, key.pItem);
+			spdlog::critical("Unable to retrieve items of key {} in section {} of the general ini", buttonMappingsSectionName, key.pItem);
 			throw std::runtime_error{ std::string{ "Unable to read values from ini" } };
 		}
 		
 		for (long const& value : valueList) {
 			if (value < 0x01 || value > 0xFF) {
-				spdlog::warn("Invalid Key value in ini for key \"{}\": {}", key.pItem, value);
+				spdlog::error("Invalid Key value in ini for key \"{}\": {}", key.pItem, value);
 				continue;
 			}
 			returnVector.push_back(ButtonMapping{ 
@@ -200,23 +256,31 @@ std::vector<ButtonMapping> IniOptions::LoadButtonMappings() const
 
 void IniOptions::StoreInfos(std::vector<const IInfo*> infos) const
 {
+	spdlog::debug("Writing {} entries to savefile", infos.size());
 	CSimpleIniA stateIni;
 	if (stateIni.LoadFile(m_stateFilePath.c_str()) < 0) {
-		spdlog::info("No savefile found under {}. Creating new savefile...", m_stateFilePath.string());
-	}; // error is fine, just write instead
+		spdlog::info("No savefile found under {}. Creating new savefile upon writing...", m_stateFilePath.string());
+	}; // error on reading is fine, just write later
+
 	for (auto const& entry : infos) {
-		stateIni.SetLongValue(
-			entry->GetClass() == InfoClass::AnimalInfo ? animalSectionName : categorySectionName,
-			entry->GetKey().c_str(),
-			static_cast<long>(entry->GetQualityBitmask())
-		);
+
+		const char* sectionName{ (entry->GetClass() == InfoClass::AnimalInfo) ? animalSectionName : categorySectionName };
+		const char* keyName{ entry->GetKey().c_str() };
+		long bitmask{ static_cast<long>(entry->GetQualityBitmask()) };
+
+		spdlog::trace("Writing entry \"{}:{} = {}\" to savefile", sectionName, keyName, bitmask);
+		stateIni.SetLongValue(sectionName, keyName, bitmask);
 	}
-	if (!std::filesystem::exists(m_stateFilePath.parent_path())) {
-		std::filesystem::create_directories(m_stateFilePath.parent_path());
+
+	if (std::filesystem::path folderPath{ m_stateFilePath.parent_path() }; !std::filesystem::exists(folderPath)) {
+		spdlog::info("Savefile directory {} does not exist, creating it", folderPath.string());
+		std::filesystem::create_directories(folderPath);
 	}
 	if (stateIni.SaveFile(m_stateFilePath.c_str()) < 0) {
-		spdlog::warn("Unable to write to file {}! Check your file priviliges or configure a different output file.", m_stateFilePath.string());
+		spdlog::error("Unable to write to file {}! Check your file priviliges or configure a different output file.", m_stateFilePath.string());
+		return;
 	}
+	spdlog::debug("Successfully wrote to savefile.");
 }
 
 const char* IniOptions::GetLocale() const
@@ -228,11 +292,13 @@ std::string IniOptions::ExpandEnvironmentVariables(const std::string& input)
 {
 	DWORD requiredSize = ExpandEnvironmentStringsA(input.c_str(), nullptr, 0);
 	if (requiredSize == 0) { //expansion failure, return original
+		spdlog::error("Failed to expand environment variables in string \"{}\"", input);
 		return input;
 	}
 	std::vector<char>buffer(static_cast<size_t>(requiredSize), '\0');
 	DWORD charsWritten = ExpandEnvironmentStringsA(input.c_str(), buffer.data(), requiredSize);
 	if (charsWritten == 0 || charsWritten > requiredSize) {
+		spdlog::error("Failed to expand environment variables in string \"{}\"", input);
 		return input;
 	}
 	return std::string{ buffer.begin(), buffer.end() };
